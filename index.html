@@ -409,7 +409,23 @@
                         const response = await fetch(fileName);
                         if (response.ok) {
                             const text = await response.text();
-                            posts.push({ number: fileNumber, content: text, fileName: fileName });
+                            
+                            // Extract YouTube ID if present
+                            let postYouTubeId = null;
+                            const lines = text.split('\n');
+                            for (const line of lines) {
+                                if (line.startsWith('YOUTUBE:')) {
+                                    postYouTubeId = line.replace('YOUTUBE:', '').trim();
+                                    break;
+                                }
+                            }
+                            
+                            posts.push({ 
+                                number: fileNumber, 
+                                content: text, 
+                                fileName: fileName,
+                                youtubeId: postYouTubeId
+                            });
                             consecutiveFailures = 0;
                         } else {
                             consecutiveFailures++;
@@ -424,37 +440,27 @@
                 // Sort posts by number (descending - highest first)
                 posts.sort((a, b) => b.number - a.number);
                 
-                // Check for YouTube ID in the most recent post
-                if (posts.length > 0) {
-                    const lines = posts[0].content.split('\n');
-                    for (const line of lines) {
-                        if (line.startsWith('YOUTUBE:')) {
-                            const youtubeId = line.replace('YOUTUBE:', '').trim();
-                            if (youtubeId) {
-                                latestYouTubeId = youtubeId;
-                            }
-                            break;
-                        }
-                    }
+                // Get the most recent YouTube ID
+                if (posts.length > 0 && posts[0].youtubeId) {
+                    latestYouTubeId = posts[0].youtubeId;
                 }
                 
-                // Set the YouTube video
-                if (player && player.loadVideoById) {
-                    player.loadVideoById({
-                        'videoId': latestYouTubeId,
-                        'loop': 1
-                    });
+                // Set the initial YouTube video
+                if (window.YT && window.YT.Player && player && player.loadVideoById) {
+                    player.loadVideoById(latestYouTubeId);
                 } else {
-                    // If player not ready, update the iframe src
                     currentVideoId = latestYouTubeId;
-                    document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${latestYouTubeId}?autoplay=1&loop=1&enablejsapi=1`;
+                    const iframe = document.getElementById('ytPlayer');
+                    iframe.src = `https://www.youtube.com/embed/${latestYouTubeId}?autoplay=1&loop=1&playlist=${latestYouTubeId}&enablejsapi=1`;
                 }
                 
                 // Display posts
                 if (posts.length > 0) {
-                    posts.forEach(post => {
+                    posts.forEach((post, index) => {
                         const postDiv = document.createElement('div');
                         postDiv.className = 'post';
+                        postDiv.setAttribute('data-youtube-id', post.youtubeId || 'none');
+                        postDiv.setAttribute('data-post-index', index);
                         
                         // Extract date if it's in the first line
                         const lines = post.content.split('\n');
@@ -488,6 +494,9 @@
                         
                         container.appendChild(postDiv);
                     });
+                    
+                    // Set up scroll detection
+                    setupScrollDetection();
                 } else {
                     container.innerHTML = '<div class="post"><div class="post-content">No posts found. Add text files named Data_0001.txt, Data_0002.txt, etc. to display content.</div></div>';
                 }
