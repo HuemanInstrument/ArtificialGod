@@ -391,7 +391,7 @@
         // YouTube Player Controls
         let player;
         let isPlaying = true;
-        let latestYouTubeId = 'yQmmG2JmnEk'; // Default video ID
+        let latestYouTubeId = 'yQmmG2JmnEk'; // Default
         let currentId = '';
         
         // Load text files
@@ -451,25 +451,20 @@
                         postDiv.className = 'post';
                         
                         // Extract YouTube ID for this post
-                        let postYouTubeId = '';
-                        const allLines = post.content.split('\n');
-                        for (const line of allLines) {
-                            if (line.startsWith('YOUTUBE:')) {
-                                postYouTubeId = line.replace('YOUTUBE:', '').trim();
-                                break;
-                            }
-                        }
-                        
-                        // Store YouTube ID in dataset
-                        postDiv.dataset.youtube = postYouTubeId;
-                        
-                        // Extract date if it's in the first line
+                        let youtubeId = '';
                         const lines = post.content.split('\n');
-                        let dateHtml = '';
-                        let contentStart = 0;
+                        lines.forEach(line => {
+                            if (line.startsWith('YOUTUBE:')) {
+                                youtubeId = line.split(':')[1].trim();
+                            }
+                        });
+                        postDiv.dataset.youtube = youtubeId; // Store in data attribute
                         
                         // Filter out YOUTUBE: lines from display
                         const displayLines = lines.filter(line => !line.startsWith('YOUTUBE:'));
+                        
+                        let dateHtml = '';
+                        let contentStart = 0;
                         
                         // Check if first line looks like a date
                         if (displayLines[0] && displayLines[0].match(/\d{4}-\d{2}-\d{2}|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER/i)) {
@@ -495,9 +490,6 @@
                         
                         container.appendChild(postDiv);
                     });
-                    
-                    // Set up intersection observer for scroll-based video switching
-                    setupIntersectionObserver();
                 } else {
                     container.innerHTML = '<div class="post"><div class="post-content">No posts found. Add text files named Data_0001.txt, Data_0002.txt, etc. to display content.</div></div>';
                 }
@@ -506,30 +498,18 @@
             }
         }
         
-        // Load posts on page load
-        loadPosts();
-        
-        // Load YouTube API
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-        
         // YouTube API callback
         window.onYouTubeIframeAPIReady = function() {
             player = new YT.Player('ytPlayer', {
                 videoId: latestYouTubeId,
                 playerVars: {
-                    'autoplay': 1,
-                    'loop': 1,
-                    'playlist': latestYouTubeId,
-                    'controls': 0,
-                    'showinfo': 0,
-                    'modestbranding': 1
+                    autoplay: 1,
+                    loop: 1,
+                    playlist: latestYouTubeId
                 },
                 events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange
+                    onReady: onPlayerReady,
+                    onStateChange: onPlayerStateChange
                 }
             });
             currentId = latestYouTubeId;
@@ -541,7 +521,8 @@
             
             // Play/Pause button
             document.getElementById('playPauseBtn').addEventListener('click', function() {
-                if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+                const state = player.getPlayerState();
+                if (state === 1) { // Playing
                     player.pauseVideo();
                 } else {
                     player.playVideo();
@@ -552,42 +533,45 @@
             document.getElementById('volumeSlider').addEventListener('input', function(e) {
                 player.setVolume(e.target.value);
             });
-        }
-        
-        function onPlayerStateChange(event) {
-            if (event.data === YT.PlayerState.PLAYING) {
-                document.getElementById('playPauseBtn').textContent = 'PAUSE';
-                isPlaying = true;
-            } else if (event.data === YT.PlayerState.PAUSED) {
-                document.getElementById('playPauseBtn').textContent = 'PLAY';
-                isPlaying = false;
-            }
-        }
-        
-        // Intersection Observer for scroll-based video switching
-        function setupIntersectionObserver() {
+            
+            // Set up intersection observer
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const id = entry.target.dataset.youtube;
-                        if (id && id !== currentId && player && player.loadVideoById) {
+                        if (id && id !== currentId) {
                             currentId = id;
-                            player.loadVideoById({
-                                videoId: id,
-                                loop: 1
-                            });
+                            player.loadVideoById({ videoId: id });
                         }
                     }
                 });
-            }, {
-                threshold: 0.6 // Post needs to be 60% visible
-            });
+            }, { threshold: 0.6 });
             
             // Observe all posts
             document.querySelectorAll('.post').forEach(post => {
                 observer.observe(post);
             });
         }
+        
+        function onPlayerStateChange(event) {
+            const btn = document.getElementById('playPauseBtn');
+            if (event.data === 1) { // Playing
+                btn.textContent = 'PAUSE';
+                isPlaying = true;
+            } else if (event.data === 2) { // Paused
+                btn.textContent = 'PLAY';
+                isPlaying = false;
+            }
+        }
+        
+        // Load posts first
+        loadPosts();
+        
+        // Then load YouTube API
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     </script>
 </body>
 </html>
