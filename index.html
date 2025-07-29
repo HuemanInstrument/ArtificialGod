@@ -3,322 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Article Formatter for Social Media</title>
+    <title>Hueman Instrumentality</title>
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             background-color: #0a0a0a;
             color: #e0e0e0;
-            line-height: 1.6;
+            font-family: Georgia, serif;
+            line-height: 1.8;
+        }
+        
+        /* Header with gradient background */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        h1 {
-            color: #ffd700;
             text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
         
-        .input-section, .output-section {
-            background-color: #1a1a1a;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border: 1px solid #333;
-        }
-        
-        h2 {
-            color: #ffd700;
-            margin-bottom: 15px;
-            font-size: 1.8em;
-        }
-        
-        textarea {
-            width: 100%;
-            min-height: 400px;
-            background-color: #0a0a0a;
-            color: #e0e0e0;
-            border: 1px solid #444;
-            border-radius: 5px;
-            padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            resize: vertical;
-        }
-        
-        textarea:focus {
-            outline: none;
-            border-color: #ffd700;
-        }
-        
-        .format-buttons {
+        .social-links {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        button {
-            background-color: #ffd700;
-            color: #0a0a0a;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        
-        button:hover {
-            background-color: #ffed4e;
-            transform: translateY(-2px);
-        }
-        
-        .preview {
-            background-color: #0a0a0a;
-            border: 1px solid #444;
-            border-radius: 5px;
-            padding: 20px;
-            margin-top: 15px;
-            white-space: pre-wrap;
-            font-family: 'Georgia', serif;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-        
-        .header-symbols {
-            text-align: center;
-            color: #ffd700;
-            margin: 20px 0;
-            font-size: 1.2em;
-        }
-        
-        .article-title {
-            font-size: 2em;
-            font-weight: bold;
-            color: #ffd700;
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .hashtag-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #444;
-        }
-        
-        .hashtag-platform {
-            margin-bottom: 15px;
-        }
-        
-        .hashtag-platform h3 {
-            color: #ffd700;
-            margin-bottom: 5px;
-        }
-        
-        .hashtags {
-            color: #4a9eff;
-            word-wrap: break-word;
-        }
-        
-        .copy-btn {
-            background-color: #4a9eff;
-            font-size: 12px;
-            padding: 5px 10px;
-            margin-left: 10px;
-        }
-        
-        .word-count {
-            color: #888;
-            font-size: 14px;
+            justify-content: center;
+            gap: 15px;
             margin-top: 10px;
         }
         
-        .gold-bar {
-            background-color: #ffd700;
-            height: 2px;
-            margin: 30px 0;
+        .social-links a {
+            color: white;
+            font-size: 24px;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+        
+        .social-links a:hover {
+            transform: scale(1.2);
+        }
+        
+        /* Main content area */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        /* Individual posts */
+        .post {
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .post-date {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .post-title {
+            color: #ffd700;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+        
+        .post-content {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        /* Audio player */
+        .audio-player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+        }
+        
+        .audio-player iframe {
+            width: 300px;
+            height: 80px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>✨ Article Formatter for Social Media ✨</h1>
-        
-        <div class="input-section">
-            <h2>📝 Input Your Article</h2>
-            <textarea id="articleInput" placeholder="Paste your article here..."></textarea>
-            <div class="word-count" id="wordCount">Words: 0 | Characters: 0</div>
-        </div>
-        
-        <div class="format-buttons">
-            <button onclick="formatNormal()">📄 Normal Format</button>
-            <button onclick="formatMobile()">📱 Mobile Format (Word Wrap)</button>
-            <button onclick="addGoldBorders()">⭐ Add Gold Borders</button>
-            <button onclick="clearAll()">🗑️ Clear All</button>
-        </div>
-        
-        <div class="output-section">
-            <h2>✨ Formatted Output</h2>
-            <button onclick="copyToClipboard()" style="float: right; margin-bottom: 10px;">📋 Copy to Clipboard</button>
-            <div style="clear: both;"></div>
-            <textarea id="formattedOutput" placeholder="Your formatted article will appear here..."></textarea>
-            
-            <h3 style="margin-top: 20px; color: #ffd700;">Preview:</h3>
-            <div class="preview" id="preview"></div>
-        </div>
-        
-        <div class="gold-bar"></div>
-        
-        <div class="output-section">
-            <h2>🏷️ Hashtags by Platform</h2>
-            <div id="hashtagContainer"></div>
+    <div class="header">
+        <h1 style="margin: 0; color: white;">Hueman Instrumentality</h1>
+        <div class="social-links">
+            <a href="https://www.tiktok.com/@huemaninstrument" title="TikTok">📱</a>
+            <a href="https://www.facebook.com/HuemanInstrument" title="Facebook">📘</a>
+            <a href="https://www.youtube.com/@HuemanInstrumentality" title="YouTube">📺</a>
+            <a href="https://www.instagram.com/huemaninstrument/" title="Instagram">📷</a>
+            <a href="https://www.tumblr.com/hueman-instrumentality" title="Tumblr">📝</a>
+            <a href="https://www.pinterest.com/HuemanInstrumentality/" title="Pinterest">📌</a>
+            <a href="https://truthsocial.com/@HuemanInstrumentality" title="Truth Social">🗽</a>
+            <a href="https://x.com/EuclideanPlane" title="X/Twitter">✖️</a>
+            <a href="https://bsky.app/profile/huemaninstrument.bsky.social" title="Bluesky">☁️</a>
         </div>
     </div>
     
+    <div class="container">
+        <!-- Post for today -->
+        <div class="post" data-song="dQw4w9WgXcQ">
+            <div class="post-date">January 27, 2025</div>
+            <div class="post-title">Schizophrenia—Mental Models and the Power of Imagination</div>
+            <div class="post-content">We all carry models of other people in our heads. Your brain has built a working model of everyone you know well, especially those you love. Think about someone close to you - your mother, perhaps. You can predict what she'd say about almost any topic. You know her opinions, her speech patterns, her likely reactions. It's a neural model you've constructed through thousands of hours of interaction.
+
+Love might have evolved partly for this purpose - to motivate us to spend enough time with certain people that we can model their minds accurately. Children model their parents. Parents model their children. Friends model friends. It's how we predict social outcomes, avoid conflicts, and maintain relationships. These models are so detailed that we can have entire conversations with someone in our heads and be reasonably accurate about their responses.
+
+[Rest of your article goes here...]</div>
+        </div>
+        
+        <!-- Example of another post -->
+        <div class="post" data-song="3JWTaaS7LdU">
+            <div class="post-date">January 26, 2025</div>
+            <div class="post-title">The Sun Behind the Saviors</div>
+            <div class="post-content">Earth tilts at 23.3 degrees. This single fact may have shaped our entire evolutionary trajectory...</div>
+        </div>
+    </div>
+    
+    <!-- Audio player -->
+    <div class="audio-player">
+        <div id="youtube-player"></div>
+    </div>
+    
     <script>
-        const goldHeader = "△➞ ://0017 Hueman ≈ Instrumentality • [1653] ➞ ▲";
-        const goldBorder = "▌│█║▌║▌║🔅 ╚╚|░|☀️△☀️|░|╝╝🔅║▌║▌║█│▌";
+        // Simple YouTube audio player
+        let currentSong = '';
         
-        const hashtagSets = {
-            "Twitter/X": "#MentalHealth #Schizophrenia #Psychology #God #Jesus #Religion #Christianity #HolySpirit #Faith #Brain #Imagination #Prayer #Church #Psychosis #Neuroscience #MentalModels #Truth #MentalIllness #Consciousness #Christ #Bible #Spirituality #Catholic #Protestant #Theology #Philosophy #Mind #BrainScience #Delusion #Hallucination #Christian #Belief #Cognition #Perception #Reality #Simulation #McKenna #Psychedelics #Evolution #SocialPsychology #Love #Family #Thoughts #Science #Research #Psychiatry #Therapy #Recovery #Healing #Hope",
-            "Instagram": "#MentalHealth #Schizophrenia #Psychology #God #Jesus #Religion #Christianity #HolySpirit #Faith #Brain #Imagination #Prayer #Church #Bible #Psychosis #Neuroscience #MentalModels #Christ #Spirituality #MentalIllness #Consciousness #Christian #Catholic #Protestant #Theology #Philosophy #Mind #BrainScience #Truth #Love",
-            "TikTok": "#MentalHealth #Psychology #God #Jesus #Religion #Faith #Brain #fyp #Christian #Schizophrenia",
-            "Facebook": "#MentalHealth #Schizophrenia #Psychology #God #Jesus #Religion #Christianity #Faith #Brain #Church #Prayer #MentalIllness #Spirituality #Neuroscience #Truth",
-            "YouTube": "#MentalHealth #Schizophrenia #Psychology #God #Jesus #Religion #Christianity #Documentary #Faith #Brain #Church #Neuroscience #MentalIllness #Spirituality #Education",
-            "Pinterest": "#MentalHealth #Psychology #God #Jesus #Religion #Christianity #Faith #Brain #HolySpirit #Church #Prayer #Spirituality #Neuroscience #MentalIllness #Christ #Bible #Philosophy #Love #Healing #Truth",
-            "Tumblr": "#mental health #schizophrenia #psychology #god #jesus #religion #christianity #holy spirit #faith #brain #church #prayer #mental illness #neuroscience #theology #spirituality #philosophy #love #consciousness #imagination #psychosis #hallucinations #delusions #mental models #cognitive psychology #brain science #truth #healing #recovery #thoughts",
-            "Bluesky": "#MentalHealth #Schizophrenia #Psychology #Religion #God #Jesus #Christianity #Neuroscience #Faith #Philosophy #Theology #Brain #MentalModels #Science #Church #Consciousness #Research #Psychiatry #Spirituality #Truth",
-            "Truth Social": "#MentalHealth #God #Jesus #Religion #Christianity #Truth #Faith #HolySpirit #Psychology #Brain #Church #Bible #Prayer #Christian #Science #Research #Christ #Spirituality #Freedom #Consciousness #Philosophy #MentalIllness #Schizophrenia #Reality #Love #Family #Healing #Hope #Wisdom #Knowledge"
-        };
-        
-        document.getElementById('articleInput').addEventListener('input', updateWordCount);
-        document.getElementById('articleInput').addEventListener('input', updatePreview);
-        
-        function updateWordCount() {
-            const text = document.getElementById('articleInput').value;
-            const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
-            const chars = text.length;
-            document.getElementById('wordCount').textContent = `Words: ${words} | Characters: ${chars}`;
-        }
-        
-        function formatNormal() {
-            const input = document.getElementById('articleInput').value;
-            document.getElementById('formattedOutput').value = input;
-            updatePreview();
-        }
-        
-        function formatMobile() {
-            const input = document.getElementById('articleInput').value;
-            const lines = input.split('\n');
-            const formatted = lines.map(line => {
-                if (line.trim() === '') return '';
-                if (line.length <= 50) return line;
+        function updateSong() {
+            const posts = document.querySelectorAll('.post');
+            const scrollPosition = window.scrollY + window.innerHeight / 2;
+            
+            posts.forEach(post => {
+                const postTop = post.offsetTop;
+                const postBottom = postTop + post.offsetHeight;
                 
-                const words = line.split(' ');
-                let currentLine = '';
-                let result = [];
-                
-                words.forEach(word => {
-                    if ((currentLine + word).length > 50) {
-                        result.push(currentLine.trim());
-                        currentLine = word + ' ';
-                    } else {
-                        currentLine += word + ' ';
+                if (scrollPosition >= postTop && scrollPosition <= postBottom) {
+                    const song = post.getAttribute('data-song');
+                    if (song && song !== currentSong) {
+                        currentSong = song;
+                        document.getElementById('youtube-player').innerHTML = 
+                            `<iframe src="https://www.youtube.com/embed/${song}?autoplay=1" 
+                             frameborder="0" allow="autoplay; encrypted-media"></iframe>`;
                     }
-                });
-                
-                if (currentLine.trim()) {
-                    result.push(currentLine.trim());
                 }
-                
-                return result.join('\n');
-            }).join('\n\n');
-            
-            document.getElementById('formattedOutput').value = formatted;
-            updatePreview();
-        }
-        
-        function addGoldBorders() {
-            const input = document.getElementById('formattedOutput').value || document.getElementById('articleInput').value;
-            const formatted = `${goldHeader}\n${goldBorder}\n\n${input}\n\n${goldBorder}`;
-            document.getElementById('formattedOutput').value = formatted;
-            updatePreview();
-        }
-        
-        function clearAll() {
-            document.getElementById('articleInput').value = '';
-            document.getElementById('formattedOutput').value = '';
-            document.getElementById('preview').innerHTML = '';
-            updateWordCount();
-        }
-        
-        function copyToClipboard() {
-            const output = document.getElementById('formattedOutput');
-            output.select();
-            document.execCommand('copy');
-            alert('Copied to clipboard!');
-        }
-        
-        function copyHashtags(platform) {
-            const hashtags = hashtagSets[platform];
-            navigator.clipboard.writeText(hashtags).then(() => {
-                alert(`${platform} hashtags copied!`);
             });
         }
         
-        function updatePreview() {
-            const text = document.getElementById('formattedOutput').value || document.getElementById('articleInput').value;
-            const preview = document.getElementById('preview');
-            
-            // Simple formatting for preview
-            let formatted = text
-                .split('\n')
-                .map(line => {
-                    if (line.includes('△➞') || line.includes('▌│█║▌║▌║')) {
-                        return `<div class="header-symbols">${line}</div>`;
-                    } else if (line.match(/^[A-Z].*—.*$/)) {
-                        return `<div class="article-title">${line}</div>`;
-                    } else {
-                        return line;
-                    }
-                })
-                .join('\n');
-            
-            preview.textContent = text;
-        }
-        
-        // Initialize hashtag display
-        function displayHashtags() {
-            const container = document.getElementById('hashtagContainer');
-            container.innerHTML = '';
-            
-            Object.entries(hashtagSets).forEach(([platform, hashtags]) => {
-                const div = document.createElement('div');
-                div.className = 'hashtag-platform';
-                div.innerHTML = `
-                    <h3>${platform} 
-                        <button class="copy-btn" onclick="copyHashtags('${platform}')">Copy</button>
-                    </h3>
-                    <div class="hashtags">${hashtags}</div>
-                `;
-                container.appendChild(div);
-            });
-        }
-        
-        displayHashtags();
+        // Update song on scroll
+        window.addEventListener('scroll', updateSong);
+        // Check on page load
+        updateSong();
     </script>
 </body>
 </html>
