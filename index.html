@@ -439,7 +439,16 @@
                 }
                 
                 // Set the YouTube video
-                document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${latestYouTubeId}?autoplay=1&loop=1&enablejsapi=1`;
+                if (player && player.loadVideoById) {
+                    player.loadVideoById({
+                        'videoId': latestYouTubeId,
+                        'loop': 1
+                    });
+                } else {
+                    // If player not ready, update the iframe src
+                    currentVideoId = latestYouTubeId;
+                    document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${latestYouTubeId}?autoplay=1&loop=1&enablejsapi=1`;
+                }
                 
                 // Display posts
                 if (posts.length > 0) {
@@ -487,12 +496,13 @@
             }
         }
         
-        // Load posts on page load
-        loadPosts();
+        // Don't load posts immediately - wait for YouTube API
+        // loadPosts() is now called from onPlayerReady
         
         // YouTube Player Controls
         let player;
         let isPlaying = true;
+        let currentVideoId = 'yQmmG2JmnEk'; // Default
         
         // Load YouTube API
         const tag = document.createElement('script');
@@ -502,7 +512,14 @@
         
         // YouTube API callback
         window.onYouTubeIframeAPIReady = function() {
+            // Create player without video ID first
             player = new YT.Player('ytPlayer', {
+                videoId: currentVideoId,
+                playerVars: {
+                    'autoplay': 1,
+                    'loop': 1,
+                    'playlist': currentVideoId
+                },
                 events: {
                     'onReady': onPlayerReady
                 }
@@ -512,6 +529,9 @@
         function onPlayerReady(event) {
             // Set initial volume
             player.setVolume(50);
+            
+            // Load the posts which will set the correct video
+            loadPosts();
             
             // Play/Pause button
             document.getElementById('playPauseBtn').addEventListener('click', function() {
