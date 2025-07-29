@@ -5,72 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hueman Instrumentality</title>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
-            background-color: #0a0a0a;
-            color: #e0e0e0;
-            font-family: Georgia, serif;
-            line-height: 1.8;
+            box-sizing: border-box;
         }
         
-        /* Header with gradient background */
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: -apple-system, Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            text-align: center;
-            position: sticky;
+            background-color: #000;
+            padding: 15px 20px;
+            position: fixed;
             top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #fff;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .site-title {
+            font-size: 14px;
+            font-weight: normal;
+            letter-spacing: 1px;
         }
         
         .social-links {
             display: flex;
-            justify-content: center;
             gap: 15px;
-            margin-top: 10px;
         }
         
         .social-links a {
-            color: white;
-            font-size: 24px;
+            color: #fff;
             text-decoration: none;
-            transition: transform 0.3s;
+            font-size: 11px;
+            opacity: 0.7;
+            transition: opacity 0.3s;
         }
         
         .social-links a:hover {
-            transform: scale(1.2);
+            opacity: 1;
         }
         
-        /* Main content area */
+        /* Background canvas */
+        #distortionCanvas {
+            position: fixed;
+            top: 50px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 50px);
+            z-index: -1;
+        }
+        
+        /* Main content */
         .container {
-            max-width: 600px;
+            max-width: 480px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 80px 20px 100px;
+            background-color: rgba(0, 0, 0, 0.85);
+            min-height: 100vh;
         }
         
-        /* Individual posts */
         .post {
-            margin-bottom: 60px;
-            padding-bottom: 40px;
-            border-bottom: 1px solid #333;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .post-date {
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 20px;
+            font-size: 10px;
+            opacity: 0.5;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
         }
         
         .post-title {
-            color: #ffd700;
-            font-size: 28px;
-            margin-bottom: 20px;
+            font-size: 16px;
+            margin-bottom: 15px;
             font-weight: normal;
+            letter-spacing: 0.5px;
         }
         
         .post-content {
+            font-size: 11px;
+            line-height: 1.8;
+            opacity: 0.9;
             white-space: pre-wrap;
             word-wrap: break-word;
         }
@@ -81,87 +114,295 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(0, 0, 0, 0.9);
+            background-color: #000;
+            border-top: 1px solid #fff;
             padding: 10px;
             text-align: center;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+            height: 0;
+            overflow: hidden;
         }
         
-        .audio-player iframe {
-            width: 300px;
-            height: 80px;
+        /* Loading message */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1 style="margin: 0; color: white;">Hueman Instrumentality</h1>
-        <div class="social-links">
-            <a href="https://www.tiktok.com/@huemaninstrument" title="TikTok">📱</a>
-            <a href="https://www.facebook.com/HuemanInstrument" title="Facebook">📘</a>
-            <a href="https://www.youtube.com/@HuemanInstrumentality" title="YouTube">📺</a>
-            <a href="https://www.instagram.com/huemaninstrument/" title="Instagram">📷</a>
-            <a href="https://www.tumblr.com/hueman-instrumentality" title="Tumblr">📝</a>
-            <a href="https://www.pinterest.com/HuemanInstrumentality/" title="Pinterest">📌</a>
-            <a href="https://truthsocial.com/@HuemanInstrumentality" title="Truth Social">🗽</a>
-            <a href="https://x.com/EuclideanPlane" title="X/Twitter">✖️</a>
-            <a href="https://bsky.app/profile/huemaninstrument.bsky.social" title="Bluesky">☁️</a>
+        <div class="header-content">
+            <h1 class="site-title">HUEMAN INSTRUMENTALITY</h1>
+            <nav class="social-links">
+                <a href="https://www.tiktok.com/@huemaninstrument">TIK</a>
+                <a href="https://www.facebook.com/HuemanInstrument">FB</a>
+                <a href="https://www.youtube.com/@HuemanInstrumentality">YT</a>
+                <a href="https://www.instagram.com/huemaninstrument/">IG</a>
+                <a href="https://www.tumblr.com/hueman-instrumentality">TMB</a>
+                <a href="https://www.pinterest.com/HuemanInstrumentality/">PIN</a>
+                <a href="https://truthsocial.com/@HuemanInstrumentality">TRU</a>
+                <a href="https://x.com/EuclideanPlane">X</a>
+                <a href="https://bsky.app/profile/huemaninstrument.bsky.social">BSK</a>
+            </nav>
         </div>
     </div>
     
-    <div class="container">
-        <!-- Post for today -->
-        <div class="post" data-song="dQw4w9WgXcQ">
-            <div class="post-date">January 27, 2025</div>
-            <div class="post-title">Schizophrenia—Mental Models and the Power of Imagination</div>
-            <div class="post-content">We all carry models of other people in our heads. Your brain has built a working model of everyone you know well, especially those you love. Think about someone close to you - your mother, perhaps. You can predict what she'd say about almost any topic. You know her opinions, her speech patterns, her likely reactions. It's a neural model you've constructed through thousands of hours of interaction.
-
-Love might have evolved partly for this purpose - to motivate us to spend enough time with certain people that we can model their minds accurately. Children model their parents. Parents model their children. Friends model friends. It's how we predict social outcomes, avoid conflicts, and maintain relationships. These models are so detailed that we can have entire conversations with someone in our heads and be reasonably accurate about their responses.
-
-[Rest of your article goes here...]</div>
-        </div>
-        
-        <!-- Example of another post -->
-        <div class="post" data-song="3JWTaaS7LdU">
-            <div class="post-date">January 26, 2025</div>
-            <div class="post-title">The Sun Behind the Saviors</div>
-            <div class="post-content">Earth tilts at 23.3 degrees. This single fact may have shaped our entire evolutionary trajectory...</div>
-        </div>
+    <canvas id="distortionCanvas"></canvas>
+    
+    <div class="container" id="content">
+        <div class="loading">Loading posts...</div>
     </div>
     
-    <!-- Audio player -->
     <div class="audio-player">
-        <div id="youtube-player"></div>
+        <iframe width="0" height="0" src="https://www.youtube.com/embed/yQmmG2JmnEk?autoplay=1&loop=1" frameborder="0" allow="autoplay"></iframe>
     </div>
     
     <script>
-        // Simple YouTube audio player
-        let currentSong = '';
+        // Canvas setup
+        const canvas = document.getElementById('distortionCanvas');
+        const ctx = canvas.getContext('2d');
         
-        function updateSong() {
-            const posts = document.querySelectorAll('.post');
-            const scrollPosition = window.scrollY + window.innerHeight / 2;
+        // Grid vertices
+        let vertices = [];
+        let lenses = [];
+        let gridSize = 25; // Smaller squares
+        let cols, rows;
+        let scrollOffset = 0;
+        let time = 0;
+        let lastLensTime = 0;
+        
+        // Resize canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight - 50;
             
-            posts.forEach(post => {
-                const postTop = post.offsetTop;
-                const postBottom = postTop + post.offsetHeight;
-                
-                if (scrollPosition >= postTop && scrollPosition <= postBottom) {
-                    const song = post.getAttribute('data-song');
-                    if (song && song !== currentSong) {
-                        currentSong = song;
-                        document.getElementById('youtube-player').innerHTML = 
-                            `<iframe src="https://www.youtube.com/embed/${song}?autoplay=1" 
-                             frameborder="0" allow="autoplay; encrypted-media"></iframe>`;
-                    }
+            // Calculate grid dimensions with extra margin
+            cols = Math.ceil(canvas.width / gridSize) + 4;
+            rows = Math.ceil(canvas.height / gridSize) + 4;
+            
+            // Initialize vertices
+            vertices = [];
+            for (let i = 0; i <= cols; i++) {
+                vertices[i] = [];
+                for (let j = 0; j <= rows; j++) {
+                    const x = (i - 2) * gridSize;
+                    const y = (j - 2) * gridSize;
+                    vertices[i][j] = {
+                        x: x,
+                        y: y,
+                        originalX: x,
+                        originalY: y
+                    };
                 }
-            });
+            }
         }
         
-        // Update song on scroll
-        window.addEventListener('scroll', updateSong);
-        // Check on page load
-        updateSong();
+        // Lens class
+        class Lens {
+            constructor() {
+                this.radius = (Math.random() * 15 + 10) * 25; // Adjusted for smaller grid
+                this.x = Math.random() * canvas.width;
+                this.y = -this.radius;
+                this.speed = (Math.random() * 0.3 + 0.3); // Slower speed
+                this.drift = (Math.random() - 0.5) * 0.2;
+            }
+            
+            update() {
+                this.y += this.speed;
+                this.x += this.drift;
+                return this.y < canvas.height + this.radius;
+            }
+            
+            // Apply lens distortion to a vertex
+            distortVertex(vertex) {
+                const dx = vertex.x - this.x;  // Use current position, not original
+                const dy = vertex.y - this.y;  // Use current position, not original
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < this.radius) {
+                    // Lens magnification effect
+                    const factor = 1 - (distance / this.radius);
+                    const magnification = Math.pow(factor, 2) * 0.5; // Smooth falloff
+                    
+                    // Push vertices away from center (magnify)
+                    const angle = Math.atan2(dy, dx);
+                    const push = distance * magnification;
+                    
+                    vertex.x += Math.cos(angle) * push;
+                    vertex.y += Math.sin(angle) * push;
+                }
+            }
+        }
+        
+        // Animation function
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update scroll offset for continuous movement - 4x slower
+            scrollOffset += 0.075;
+            
+            // Smooth wrapping without jumps
+            if (scrollOffset >= gridSize * 2) {
+                scrollOffset -= gridSize * 2;
+            }
+            
+            // Reset vertices to original positions with scroll offset
+            for (let i = 0; i <= cols; i++) {
+                for (let j = 0; j <= rows; j++) {
+                    const vertex = vertices[i][j];
+                    vertex.x = vertex.originalX - scrollOffset;
+                    vertex.y = vertex.originalY - scrollOffset;
+                }
+            }
+            
+            // Apply lens distortions
+            for (let i = 0; i <= cols; i++) {
+                for (let j = 0; j <= rows; j++) {
+                    const vertex = vertices[i][j];
+                    
+                    // Apply each lens effect
+                    for (const lens of lenses) {
+                        lens.distortVertex(vertex);
+                    }
+                }
+            }
+            
+            // Draw distorted checkerboard
+            ctx.fillStyle = '#000011';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < cols; i++) {
+                for (let j = 0; j < rows; j++) {
+                    const p1 = vertices[i][j];
+                    const p2 = vertices[i + 1][j];
+                    const p3 = vertices[i + 1][j + 1];
+                    const p4 = vertices[i][j + 1];
+                    
+                    // Determine if this should be a dark square
+                    const offsetSquares = Math.floor(scrollOffset / gridSize);
+                    const fractionalOffset = (scrollOffset % gridSize) / gridSize;
+                    const isDark = ((i + j + offsetSquares * 2) % 2) === 0;
+                    
+                    if (isDark) {
+                        ctx.fillStyle = 'rgba(11, 0, 0, 1)';
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.lineTo(p3.x, p3.y);
+                        ctx.lineTo(p4.x, p4.y);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+                }
+            }
+            
+            // Update lenses
+            lenses = lenses.filter(lens => lens.update());
+            
+            // Add new lenses with better timing
+            if (time - lastLensTime > 180 && lenses.length < 3) { // 3 seconds minimum between lenses
+                if (Math.random() < 0.3) {
+                    lenses.push(new Lens());
+                    lastLensTime = time;
+                }
+            }
+            
+            time++;
+            requestAnimationFrame(animate);
+        }
+        
+        // Initialize
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        
+        // Start with some lenses
+        for (let i = 0; i < 2; i++) {
+            setTimeout(() => lenses.push(new Lens()), i * 2000);
+        }
+        
+        // Start animation
+        animate();
+        
+        // Load text files
+        async function loadPosts() {
+            const container = document.getElementById('content');
+            container.innerHTML = '';
+            
+            try {
+                // Try to load files from Data_0001.txt to Data_9999.txt
+                const posts = [];
+                let fileNumber = 1;
+                let consecutiveFailures = 0;
+                
+                // Keep trying to load files until we get 5 consecutive failures
+                while (consecutiveFailures < 5 && fileNumber < 1000) {
+                    const fileName = `Data_${String(fileNumber).padStart(4, '0')}.txt`;
+                    
+                    try {
+                        const response = await fetch(fileName);
+                        if (response.ok) {
+                            const text = await response.text();
+                            posts.push({ number: fileNumber, content: text, fileName: fileName });
+                            consecutiveFailures = 0;
+                        } else {
+                            consecutiveFailures++;
+                        }
+                    } catch (error) {
+                        consecutiveFailures++;
+                    }
+                    
+                    fileNumber++;
+                }
+                
+                // Sort posts by number (descending - highest first)
+                posts.sort((a, b) => b.number - a.number);
+                
+                // Display posts
+                if (posts.length > 0) {
+                    posts.forEach(post => {
+                        const postDiv = document.createElement('div');
+                        postDiv.className = 'post';
+                        
+                        // Extract date if it's in the first line
+                        const lines = post.content.split('\n');
+                        let dateHtml = '';
+                        let contentStart = 0;
+                        
+                        // Check if first line looks like a date
+                        if (lines[0] && lines[0].match(/\d{4}-\d{2}-\d{2}|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER/i)) {
+                            dateHtml = `<div class="post-date">${lines[0].toUpperCase()}</div>`;
+                            contentStart = 1;
+                        }
+                        
+                        // Check if second line looks like a title
+                        let titleHtml = '';
+                        if (lines[contentStart] && lines[contentStart].length > 0 && lines[contentStart].length < 100) {
+                            titleHtml = `<div class="post-title">${lines[contentStart]}</div>`;
+                            contentStart++;
+                        }
+                        
+                        // Rest is content
+                        const content = lines.slice(contentStart).join('\n').trim();
+                        
+                        postDiv.innerHTML = `
+                            ${dateHtml}
+                            ${titleHtml}
+                            <div class="post-content">${content}</div>
+                        `;
+                        
+                        container.appendChild(postDiv);
+                    });
+                } else {
+                    container.innerHTML = '<div class="post"><div class="post-content">No posts found. Add text files named Data_0001.txt, Data_0002.txt, etc. to display content.</div></div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="post"><div class="post-content">Error loading posts: ' + error.message + '</div></div>';
+            }
+        }
+        
+        // Load posts on page load
+        loadPosts();
     </script>
 </body>
 </html>
