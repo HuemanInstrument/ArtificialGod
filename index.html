@@ -118,8 +118,67 @@
             border-top: 1px solid #fff;
             padding: 10px;
             text-align: center;
-            height: 0;
-            overflow: hidden;
+            height: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .play-pause-btn {
+            background: none;
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 5px 15px;
+            cursor: pointer;
+            font-size: 11px;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        
+        .play-pause-btn:hover {
+            opacity: 1;
+        }
+        
+        .volume-slider {
+            width: 100px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        
+        .volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+        }
+        
+        .volume-label {
+            color: #fff;
+            font-size: 11px;
+            opacity: 0.7;
         }
         
         /* Loading message */
@@ -155,7 +214,12 @@
     </div>
     
     <div class="audio-player">
-        <iframe width="0" height="0" src="https://www.youtube.com/embed/yQmmG2JmnEk?autoplay=1&loop=1" frameborder="0" allow="autoplay"></iframe>
+        <div class="audio-controls">
+            <button class="play-pause-btn" id="playPauseBtn">PAUSE</button>
+            <span class="volume-label">VOLUME:</span>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
+        </div>
+        <iframe id="ytPlayer" width="0" height="0" src="" frameborder="0" allow="autoplay"></iframe>
     </div>
     
     <script>
@@ -329,6 +393,8 @@
             const container = document.getElementById('content');
             container.innerHTML = '';
             
+            let latestYouTubeId = 'yQmmG2JmnEk'; // Default video ID
+            
             try {
                 // Try to load files from Data_0001.txt to Data_9999.txt
                 const posts = [];
@@ -358,6 +424,23 @@
                 // Sort posts by number (descending - highest first)
                 posts.sort((a, b) => b.number - a.number);
                 
+                // Check for YouTube ID in the most recent post
+                if (posts.length > 0) {
+                    const lines = posts[0].content.split('\n');
+                    for (const line of lines) {
+                        if (line.startsWith('YOUTUBE:')) {
+                            const youtubeId = line.replace('YOUTUBE:', '').trim();
+                            if (youtubeId) {
+                                latestYouTubeId = youtubeId;
+                            }
+                            break;
+                        }
+                    }
+                }
+                
+                // Set the YouTube video
+                document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${latestYouTubeId}?autoplay=1&loop=1&enablejsapi=1`;
+                
                 // Display posts
                 if (posts.length > 0) {
                     posts.forEach(post => {
@@ -369,21 +452,24 @@
                         let dateHtml = '';
                         let contentStart = 0;
                         
+                        // Filter out YOUTUBE: lines from display
+                        const displayLines = lines.filter(line => !line.startsWith('YOUTUBE:'));
+                        
                         // Check if first line looks like a date
-                        if (lines[0] && lines[0].match(/\d{4}-\d{2}-\d{2}|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER/i)) {
-                            dateHtml = `<div class="post-date">${lines[0].toUpperCase()}</div>`;
+                        if (displayLines[0] && displayLines[0].match(/\d{4}-\d{2}-\d{2}|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER/i)) {
+                            dateHtml = `<div class="post-date">${displayLines[0].toUpperCase()}</div>`;
                             contentStart = 1;
                         }
                         
                         // Check if second line looks like a title
                         let titleHtml = '';
-                        if (lines[contentStart] && lines[contentStart].length > 0 && lines[contentStart].length < 100) {
-                            titleHtml = `<div class="post-title">${lines[contentStart]}</div>`;
+                        if (displayLines[contentStart] && displayLines[contentStart].length > 0 && displayLines[contentStart].length < 100) {
+                            titleHtml = `<div class="post-title">${displayLines[contentStart]}</div>`;
                             contentStart++;
                         }
                         
                         // Rest is content
-                        const content = lines.slice(contentStart).join('\n').trim();
+                        const content = displayLines.slice(contentStart).join('\n').trim();
                         
                         postDiv.innerHTML = `
                             ${dateHtml}
@@ -403,6 +489,48 @@
         
         // Load posts on page load
         loadPosts();
+        
+        // YouTube Player Controls
+        let player;
+        let isPlaying = true;
+        
+        // Load YouTube API
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        
+        // YouTube API callback
+        window.onYouTubeIframeAPIReady = function() {
+            player = new YT.Player('ytPlayer', {
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+        
+        function onPlayerReady(event) {
+            // Set initial volume
+            player.setVolume(50);
+            
+            // Play/Pause button
+            document.getElementById('playPauseBtn').addEventListener('click', function() {
+                if (isPlaying) {
+                    player.pauseVideo();
+                    this.textContent = 'PLAY';
+                    isPlaying = false;
+                } else {
+                    player.playVideo();
+                    this.textContent = 'PAUSE';
+                    isPlaying = true;
+                }
+            });
+            
+            // Volume slider
+            document.getElementById('volumeSlider').addEventListener('input', function(e) {
+                player.setVolume(e.target.value);
+            });
+        }
     </script>
 </body>
 </html>
