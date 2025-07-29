@@ -116,19 +116,15 @@
             right: 0;
             background-color: #000;
             border-top: 1px solid #fff;
-            padding: 10px;
-            text-align: center;
-            height: auto;
+            padding: 0;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
         }
         
         .audio-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            display: none; /* Hide our custom controls */
         }
         
         .play-pause-btn {
@@ -214,12 +210,7 @@
     </div>
     
     <div class="audio-player">
-        <div class="audio-controls">
-            <button class="play-pause-btn" id="playPauseBtn">PAUSE</button>
-            <span class="volume-label">VOLUME:</span>
-            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
-        </div>
-        <iframe id="ytPlayer" width="0" height="0" frameborder="0" allow="autoplay"></iframe>
+        <iframe id="ytPlayer" width="100%" height="60" frameborder="0" allow="autoplay"></iframe>
     </div>
     
     <script>
@@ -389,10 +380,7 @@
         animate();
         
         // YouTube Player Controls
-        let player;
-        let isPlaying = true;
-        let latestYouTubeId = 'yQmmG2JmnEk'; // Default
-        let currentId = '';
+        let currentVideoId = 'yQmmG2JmnEk'; // Default
         
         // Load text files
         async function loadPosts() {
@@ -435,23 +423,15 @@
                         if (line.startsWith('YOUTUBE:')) {
                             const youtubeId = line.replace('YOUTUBE:', '').trim();
                             if (youtubeId) {
-                                latestYouTubeId = youtubeId;
+                                currentVideoId = youtubeId;
                             }
                             break;
                         }
                     }
                 }
                 
-                // NOW load YouTube API after we have the video ID
-                if (!window.YT) {
-                    const tag = document.createElement('script');
-                    tag.src = "https://www.youtube.com/iframe_api";
-                    const firstScriptTag = document.getElementsByTagName('script')[0];
-                    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-                } else {
-                    // If API already loaded, create player directly
-                    onYouTubeIframeAPIReady();
-                }
+                // Set the YouTube video directly in iframe
+                document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${currentVideoId}?autoplay=1&loop=1&playlist=${currentVideoId}&controls=1&modestbranding=1`;
                 
                 // Display posts
                 if (posts.length > 0) {
@@ -499,6 +479,9 @@
                         
                         container.appendChild(postDiv);
                     });
+                    
+                    // Set up intersection observer for scrolling
+                    setupScrollObserver();
                 } else {
                     container.innerHTML = '<div class="post"><div class="post-content">No posts found. Add text files named Data_0001.txt, Data_0002.txt, etc. to display content.</div></div>';
                 }
@@ -507,52 +490,16 @@
             }
         }
         
-        // YouTube API callback
-        window.onYouTubeIframeAPIReady = function() {
-            console.log('Creating YouTube player with video:', latestYouTubeId);
-            player = new YT.Player('ytPlayer', {
-                videoId: latestYouTubeId,
-                playerVars: {
-                    autoplay: 1,
-                    loop: 1,
-                    playlist: latestYouTubeId,
-                    mute: 0  // Ensure not muted
-                },
-                events: {
-                    onReady: onPlayerReady,
-                    onStateChange: onPlayerStateChange
-                }
-            });
-            currentId = latestYouTubeId;
-        }
-        
-        function onPlayerReady(event) {
-            // Set initial volume
-            player.setVolume(50);
-            
-            // Play/Pause button
-            document.getElementById('playPauseBtn').addEventListener('click', function() {
-                const state = player.getPlayerState();
-                if (state === 1) { // Playing
-                    player.pauseVideo();
-                } else {
-                    player.playVideo();
-                }
-            });
-            
-            // Volume slider
-            document.getElementById('volumeSlider').addEventListener('input', function(e) {
-                player.setVolume(e.target.value);
-            });
-            
-            // Set up intersection observer
+        // Set up scroll observer
+        function setupScrollObserver() {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const id = entry.target.dataset.youtube;
-                        if (id && id !== currentId) {
-                            currentId = id;
-                            player.loadVideoById({ videoId: id });
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+                        const youtubeId = entry.target.dataset.youtube;
+                        if (youtubeId && youtubeId !== currentVideoId) {
+                            currentVideoId = youtubeId;
+                            // Update iframe src directly
+                            document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&playlist=${youtubeId}&controls=1&modestbranding=1`;
                         }
                     }
                 });
@@ -560,22 +507,13 @@
             
             // Observe all posts
             document.querySelectorAll('.post').forEach(post => {
-                observer.observe(post);
+                if (post.dataset.youtube) {
+                    observer.observe(post);
+                }
             });
         }
         
-        function onPlayerStateChange(event) {
-            const btn = document.getElementById('playPauseBtn');
-            if (event.data === 1) { // Playing
-                btn.textContent = 'PAUSE';
-                isPlaying = true;
-            } else if (event.data === 2) { // Paused
-                btn.textContent = 'PLAY';
-                isPlaying = false;
-            }
-        }
-        
-        // Load posts first
+        // Load posts
         loadPosts();
     </script>
 </body>
