@@ -492,22 +492,35 @@
         
         // Set up scroll observer
         function setupScrollObserver() {
+            let debounceTimer;
+            
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
                         const youtubeId = entry.target.dataset.youtube;
+                        console.log('Post in view, YouTube ID:', youtubeId); // Debug
+                        
                         if (youtubeId && youtubeId !== currentVideoId) {
-                            currentVideoId = youtubeId;
-                            // Update iframe src directly
-                            document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&playlist=${youtubeId}&controls=1&modestbranding=1`;
+                            // Debounce to avoid rapid changes
+                            clearTimeout(debounceTimer);
+                            debounceTimer = setTimeout(() => {
+                                console.log('Changing video to:', youtubeId); // Debug
+                                currentVideoId = youtubeId;
+                                // Update iframe src directly
+                                document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&playlist=${youtubeId}&controls=1&modestbranding=1`;
+                            }, 500); // Wait 500ms before changing
                         }
                     }
                 });
-            }, { threshold: 0.6 });
+            }, { 
+                threshold: [0.5], // Trigger when 50% visible
+                rootMargin: '-10% 0px -10% 0px' // Add margin to ensure center detection
+            });
             
             // Observe all posts
             document.querySelectorAll('.post').forEach(post => {
                 if (post.dataset.youtube) {
+                    console.log('Observing post with YouTube ID:', post.dataset.youtube); // Debug
                     observer.observe(post);
                 }
             });
