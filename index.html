@@ -1,536 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hueman Instrumentality</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            background-color: #000;
-            color: #fff;
-            font-family: -apple-system, Arial, sans-serif;
-            font-size: 12px;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        
-        /* Header */
-        .header {
-            background-color: #000;
-            padding: 15px 20px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            border-bottom: 1px solid #fff;
-        }
-        
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .site-title {
-            font-size: 14px;
-            font-weight: normal;
-            letter-spacing: 1px;
-        }
-        
-        .social-links {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .social-links a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 11px;
-            opacity: 0.7;
-            transition: opacity 0.3s;
-        }
-        
-        .social-links a:hover {
-            opacity: 1;
-        }
-        
-        /* Background canvas */
-        #distortionCanvas {
-            position: fixed;
-            top: 50px;
-            left: 0;
-            width: 100%;
-            height: calc(100% - 50px);
-            z-index: -1;
-        }
-        
-        /* Main content */
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 80px 20px 100px;
-            background-color: rgba(0, 0, 0, 0.85);
-            min-height: 100vh;
-        }
-        
-        .post {
-            margin-bottom: 50px;
-            padding-bottom: 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .post-date {
-            font-size: 10px;
-            opacity: 0.5;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
-        }
-        
-        .post-title {
-            font-size: 16px;
-            margin-bottom: 15px;
-            font-weight: normal;
-            letter-spacing: 0.5px;
-        }
-        
-        .post-content {
-            font-size: 11px;
-            line-height: 1.8;
-            opacity: 0.9;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        
-        /* Audio player */
-        .audio-player {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: #000;
-            border-top: 1px solid #fff;
-            padding: 10px;
-            text-align: center;
-            height: auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-        }
-        
-        .audio-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .play-pause-btn {
-            background: none;
-            border: 1px solid #fff;
-            color: #fff;
-            padding: 5px 15px;
-            cursor: pointer;
-            font-size: 11px;
-            opacity: 0.7;
-            transition: opacity 0.3s;
-        }
-        
-        .play-pause-btn:hover {
-            opacity: 1;
-        }
-        
-        .volume-slider {
-            width: 100px;
-            height: 4px;
-            -webkit-appearance: none;
-            appearance: none;
-            background: rgba(255, 255, 255, 0.3);
-            outline: none;
-            cursor: pointer;
-        }
-        
-        .volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 12px;
-            height: 12px;
-            background: #fff;
-            cursor: pointer;
-            border-radius: 50%;
-        }
-        
-        .volume-slider::-moz-range-thumb {
-            width: 12px;
-            height: 12px;
-            background: #fff;
-            cursor: pointer;
-            border-radius: 50%;
-            border: none;
-        }
-        
-        .volume-label {
-            color: #fff;
-            font-size: 11px;
-            opacity: 0.7;
-        }
-        
-        /* Loading message */
-        .loading {
-            text-align: center;
-            padding: 20px;
-            opacity: 0.5;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hueman Instrumentality</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:-apple-system,Arial,sans-serif;font-size:12px;line-height:1.6;overflow-x:hidden}
+.header{background:#000;padding:15px 20px;position:fixed;top:0;left:0;right:0;z-index:1000;border-bottom:1px solid #fff}
+.header-content{display:flex;align-items:center;gap:20px}
+.site-title{font-size:14px;letter-spacing:1px;font-weight:400}
+.social-links{display:flex;gap:15px}
+.social-links a{color:#fff;text-decoration:none;font-size:11px;opacity:.7;transition:opacity .3s}
+.social-links a:hover{opacity:1}
+#distortionCanvas{position:fixed;top:50px;left:0;width:100%;height:calc(100%-50px);z-index:-1}
+.container{max-width:480px;margin:0 auto;padding:80px 20px 100px;background:rgba(0,0,0,.85);min-height:100vh}
+.post{margin-bottom:50px;padding-bottom:30px;border-bottom:1px solid rgba(255,255,255,0.1)}
+.post-date{font-size:10px;opacity:.5;margin-bottom:10px;letter-spacing:1px}
+.post-title{font-size:16px;margin-bottom:15px;font-weight:400;letter-spacing:.5px}
+.post-content{font-size:11px;line-height:1.8;opacity:.9;white-space:pre-wrap;word-wrap:break-word}
+.audio-player{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #fff;padding:10px;text-align:center}
+html,body{height:100%} /* keep scrollbar */
+body{overflow-y:scroll}
+</style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <h1 class="site-title">HUEMAN INSTRUMENTALITY</h1>
-            <nav class="social-links">
-                <a href="https://www.tiktok.com/@huemaninstrument">TIK</a>
-                <a href="https://www.facebook.com/HuemanInstrument">FB</a>
-                <a href="https://www.youtube.com/@HuemanInstrumentality">YT</a>
-                <a href="https://www.instagram.com/huemaninstrument/">IG</a>
-                <a href="https://www.tumblr.com/hueman-instrumentality">TMB</a>
-                <a href="https://www.pinterest.com/HuemanInstrumentality/">PIN</a>
-                <a href="https://truthsocial.com/@HuemanInstrumentality">TRU</a>
-                <a href="https://x.com/EuclideanPlane">X</a>
-                <a href="https://bsky.app/profile/huemaninstrument.bsky.social">BSK</a>
-            </nav>
-        </div>
+<div class="header">
+    <div class="header-content">
+        <h1 class="site-title">HUEMAN INSTRUMENTALITY</h1>
+        <nav class="social-links">
+            <a href="https://www.tiktok.com/@huemaninstrument">TIK</a>
+            <a href="https://www.facebook.com/HuemanInstrument">FB</a>
+            <a href="https://www.youtube.com/@HuemanInstrumentality">YT</a>
+            <a href="https://www.instagram.com/huemaninstrument/">IG</a>
+            <a href="https://www.tumblr.com/hueman-instrumentality">TMB</a>
+            <a href="https://www.pinterest.com/HuemanInstrumentality/">PIN</a>
+            <a href="https://truthsocial.com/@HuemanInstrumentality">TRU</a>
+            <a href="https://x.com/EuclideanPlane">X</a>
+            <a href="https://bsky.app/profile/huemaninstrument.bsky.social">BSK</a>
+        </nav>
     </div>
-    
-    <canvas id="distortionCanvas"></canvas>
-    
-    <div class="container" id="content">
-        <div class="loading">Loading posts...</div>
-    </div>
-    
-    <div class="audio-player">
-        <div class="audio-controls">
-            <button class="play-pause-btn" id="playPauseBtn">PAUSE</button>
-            <span class="volume-label">VOLUME:</span>
-            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
-        </div>
-        <iframe id="ytPlayer" width="0" height="0" src="" frameborder="0" allow="autoplay"></iframe>
-    </div>
-    
-    <script>
-        // Canvas setup
-        const canvas = document.getElementById('distortionCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Grid vertices
-        let vertices = [];
-        let lenses = [];
-        let gridSize = 25; // Smaller squares
-        let cols, rows;
-        let scrollOffset = 0;
-        let time = 0;
-        let lastLensTime = 0;
-        
-        // Resize canvas
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight - 50;
-            
-            // Calculate grid dimensions with extra margin
-            cols = Math.ceil(canvas.width / gridSize) + 4;
-            rows = Math.ceil(canvas.height / gridSize) + 4;
-            
-            // Initialize vertices
-            vertices = [];
-            for (let i = 0; i <= cols; i++) {
-                vertices[i] = [];
-                for (let j = 0; j <= rows; j++) {
-                    const x = (i - 2) * gridSize;
-                    const y = (j - 2) * gridSize;
-                    vertices[i][j] = {
-                        x: x,
-                        y: y,
-                        originalX: x,
-                        originalY: y
-                    };
-                }
+</div>
+
+<canvas id="distortionCanvas"></canvas>
+
+<div class="container" id="content">
+    <div class="loading">Loading posts...</div>
+</div>
+
+<div class="audio-player">
+    <!-- Empty iframe – YouTube API will populate -->
+    <iframe id="ytPlayer" width="0" height="0" allow="autoplay"></iframe>
+</div>
+
+<!-- YouTube iframe API -->
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+// ==== Canvas distortion (bug‑fixed) ====
+const canvas=document.getElementById('distortionCanvas');
+const ctx=canvas.getContext('2d');
+let vertices=[],lenses=[],gridSize=25,cols,rows,scrollOffset=0,time=0,lastLensTime=0;
+function resizeCanvas(){
+    const dpr=window.devicePixelRatio||1;
+    canvas.style.width='100%';
+    canvas.style.height=(window.innerHeight-50)+'px';
+    canvas.width=Math.round(window.innerWidth*dpr);
+    canvas.height=Math.round((window.innerHeight-50)*dpr);
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.scale(dpr,dpr);
+    cols=Math.ceil(canvas.width/dpr/gridSize)+4;
+    rows=Math.ceil(canvas.height/dpr/gridSize)+4;
+    vertices=[];
+    for(let i=0;i<=cols;i++){
+        vertices[i]=[];
+        for(let j=0;j<=rows;j++){
+            const x=(i-2)*gridSize;
+            const y=(j-2)*gridSize;
+            vertices[i][j]={x, y, originalX:x, originalY:y};
+        }
+    }
+}
+class Lens{
+    constructor(){
+        this.radius=(Math.random()*15+10)*25;
+        this.x=Math.random()*canvas.width;
+        this.y=-this.radius;
+        this.speed=(Math.random()*0.3+0.3);
+        this.drift=(Math.random()-0.5)*0.2;
+    }
+    update(){
+        this.y+=this.speed;
+        this.x+=this.drift;
+        return this.y<canvas.height+this.radius;
+    }
+    distortVertex(v){
+        const dx=v.x - this.x;
+        const dy=v.y - this.y;
+        const dist=Math.hypot(dx,dy);
+        if(dist<this.radius){
+            const factor=1-(dist/this.radius);
+            const magnification=factor*factor*0.5;
+            const push=dist*magnification;
+            const angle=Math.atan2(dy,dx);
+            v.x+=Math.cos(angle)*push;
+            v.y+=Math.sin(angle)*push;
+        }
+    }
+}
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    scrollOffset+=0.3;
+    if(scrollOffset>=gridSize*2){scrollOffset-=gridSize*2;}
+    for(let i=0;i<=cols;i++){
+        for(let j=0;j<=rows;j++){
+            const v=vertices[i][j];
+            v.x=v.originalX-scrollOffset;
+            v.y=v.originalY-scrollOffset;
+        }
+    }
+    for(const lens of lenses){
+        for(let i=0;i<=cols;i++){
+            for(let j=0;j<=rows;j++){
+                lens.distortVertex(vertices[i][j]);
             }
         }
-        
-        // Lens class
-        class Lens {
-            constructor() {
-                this.radius = (Math.random() * 15 + 10) * 25; // Adjusted for smaller grid
-                this.x = Math.random() * canvas.width;
-                this.y = -this.radius;
-                this.speed = (Math.random() * 0.3 + 0.3); // Slower speed
-                this.drift = (Math.random() - 0.5) * 0.2;
-            }
-            
-            update() {
-                this.y += this.speed;
-                this.x += this.drift;
-                return this.y < canvas.height + this.radius;
-            }
-            
-            // Apply lens distortion to a vertex
-            distortVertex(vertex) {
-                const dx = vertex.x - this.x;  // Use current position, not original
-                const dy = vertex.y - this.y;  // Use current position, not original
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distance < this.radius) {
-                    // Lens magnification effect
-                    const factor = 1 - (distance / this.radius);
-                    const magnification = Math.pow(factor, 2) * 0.5; // Smooth falloff
-                    
-                    // Push vertices away from center (magnify)
-                    const angle = Math.atan2(dy, dx);
-                    const push = distance * magnification;
-                    
-                    vertex.x += Math.cos(angle) * push;
-                    vertex.y += Math.sin(angle) * push;
-                }
+    }
+    ctx.fillStyle='#000033';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    const offsetSquares=Math.floor(scrollOffset/gridSize);
+    for(let i=0;i<cols;i++){
+        for(let j=0;j<rows;j++){
+            const p1=vertices[i][j],p2=vertices[i+1][j],p3=vertices[i+1][j+1],p4=vertices[i][j+1];
+            const isDark=((i+j+offsetSquares*2)%2)===0;
+            if(isDark){
+                ctx.fillStyle='rgba(26,0,0,0.5)';
+                ctx.beginPath();
+                ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.lineTo(p3.x,p3.y);ctx.lineTo(p4.x,p4.y);
+                ctx.closePath();ctx.fill();
             }
         }
-        
-        // Animation function
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Update scroll offset for continuous movement - 4x slower
-            scrollOffset += 0.075;
-            
-            // Smooth wrapping without jumps
-            if (scrollOffset >= gridSize * 2) {
-                scrollOffset -= gridSize * 2;
-            }
-            
-            // Reset vertices to original positions with scroll offset
-            for (let i = 0; i <= cols; i++) {
-                for (let j = 0; j <= rows; j++) {
-                    const vertex = vertices[i][j];
-                    vertex.x = vertex.originalX - scrollOffset;
-                    vertex.y = vertex.originalY - scrollOffset;
+    }
+    lenses=lenses.filter(l=>l.update());
+    if(time-lastLensTime>180 && lenses.length<3){
+        if(Math.random()<0.3){lenses.push(new Lens());lastLensTime=time;}
+    }
+    time++;
+    requestAnimationFrame(animate);
+}
+window.addEventListener('resize',resizeCanvas);
+resizeCanvas();
+for(let i=0;i<2;i++){setTimeout(()=>lenses.push(new Lens()),i*2000);}
+animate();
+
+// ==== Blog posts & YouTube logic ====
+let player,currentVideoId=''; // default later
+function onYouTubeIframeAPIReady(){
+    // will be initialised after posts are loaded
+    if(currentVideoId){
+        player=new YT.Player('ytPlayer',{
+            videoId:currentVideoId,
+            playerVars:{autoplay:1,loop:1,playlist:currentVideoId,mute:1},
+            events:{}
+        });
+    }
+}
+
+// Load posts
+async function loadPosts(){
+    const container=document.getElementById('content');
+    container.innerHTML='';
+    const posts=[];
+    let num=1,fail=0;
+    while(fail<5 && num<1000){
+        const fname=`Data_${String(num).padStart(4,'0')}.txt`;
+        try{
+            const resp=await fetch(fname);
+            if(resp.ok){
+                const text=await resp.text();
+                posts.push({num,text});
+                fail=0;
+            }else{fail++;}
+        }catch(e){fail++;}
+        num++;
+    }
+    posts.sort((a,b)=>b.num-a.num); // newest first
+    if(posts.length===0){
+        container.innerHTML='<div class="post"><div class="post-content">No posts found.</div></div>';
+        return;
+    }
+    const observer=new IntersectionObserver(entries=>{
+        entries.forEach(e=>{
+            if(e.isIntersecting){
+                const vid=e.target.dataset.youtube;
+                if(vid && vid!==currentVideoId && player){
+                    currentVideoId=vid;
+                    player.loadVideoById({videoId:vid});
                 }
             }
-            
-            // Apply lens distortions
-            for (let i = 0; i <= cols; i++) {
-                for (let j = 0; j <= rows; j++) {
-                    const vertex = vertices[i][j];
-                    
-                    // Apply each lens effect
-                    for (const lens of lenses) {
-                        lens.distortVertex(vertex);
-                    }
-                }
-            }
-            
-            // Draw distorted checkerboard
-            ctx.fillStyle = '#000011';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            for (let i = 0; i < cols; i++) {
-                for (let j = 0; j < rows; j++) {
-                    const p1 = vertices[i][j];
-                    const p2 = vertices[i + 1][j];
-                    const p3 = vertices[i + 1][j + 1];
-                    const p4 = vertices[i][j + 1];
-                    
-                    // Determine if this should be a dark square
-                    const offsetSquares = Math.floor(scrollOffset / gridSize);
-                    const fractionalOffset = (scrollOffset % gridSize) / gridSize;
-                    const isDark = ((i + j + offsetSquares * 2) % 2) === 0;
-                    
-                    if (isDark) {
-                        ctx.fillStyle = 'rgba(11, 0, 0, 1)';
-                        ctx.beginPath();
-                        ctx.moveTo(p1.x, p1.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.lineTo(p3.x, p3.y);
-                        ctx.lineTo(p4.x, p4.y);
-                        ctx.closePath();
-                        ctx.fill();
-                    }
-                }
-            }
-            
-            // Update lenses
-            lenses = lenses.filter(lens => lens.update());
-            
-            // Add new lenses with better timing
-            if (time - lastLensTime > 180 && lenses.length < 3) { // 3 seconds minimum between lenses
-                if (Math.random() < 0.3) {
-                    lenses.push(new Lens());
-                    lastLensTime = time;
-                }
-            }
-            
-            time++;
-            requestAnimationFrame(animate);
+        });
+    },{threshold:0.6});
+    posts.forEach((p,idx)=>{
+        const lines=p.text.split('\n');
+        let dateHtml='',titleHtml='',youtubeId='';
+        let cursor=0;
+        if(lines[0] && lines[0].match(/\d{4}-\d{2}-\d{2}|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER/i)){
+            dateHtml=`<div class="post-date">${lines[0].toUpperCase()}</div>`;
+            cursor=1;
         }
-        
-        // Initialize
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-        
-        // Start with some lenses
-        for (let i = 0; i < 2; i++) {
-            setTimeout(() => lenses.push(new Lens()), i * 2000);
+        if(lines[cursor] && lines[cursor].length>0 && lines[cursor].length<100){
+            titleHtml=`<div class="post-title">${lines[cursor]}</div>`;
+            cursor++;
         }
-        
-        // Start animation
-        animate();
-        
-        // Load text files
-        async function loadPosts() {
-            const container = document.getElementById('content');
-            container.innerHTML = '';
-            
-            let latestYouTubeId = 'yQmmG2JmnEk'; // Default video ID
-            
-            try {
-                // Try to load files from Data_0001.txt to Data_9999.txt
-                const posts = [];
-                let fileNumber = 1;
-                let consecutiveFailures = 0;
-                
-                // Keep trying to load files until we get 5 consecutive failures
-                while (consecutiveFailures < 5 && fileNumber < 1000) {
-                    const fileName = `Data_${String(fileNumber).padStart(4, '0')}.txt`;
-                    
-                    try {
-                        const response = await fetch(fileName);
-                        if (response.ok) {
-                            const text = await response.text();
-                            posts.push({ number: fileNumber, content: text, fileName: fileName });
-                            consecutiveFailures = 0;
-                        } else {
-                            consecutiveFailures++;
-                        }
-                    } catch (error) {
-                        consecutiveFailures++;
-                    }
-                    
-                    fileNumber++;
-                }
-                
-                // Sort posts by number (descending - highest first)
-                posts.sort((a, b) => b.number - a.number);
-                
-                // Check for YouTube ID in the most recent post
-                if (posts.length > 0) {
-                    const lines = posts[0].content.split('\n');
-                    for (const line of lines) {
-                        if (line.startsWith('YOUTUBE:')) {
-                            const youtubeId = line.replace('YOUTUBE:', '').trim();
-                            if (youtubeId) {
-                                latestYouTubeId = youtubeId;
-                            }
-                            break;
-                        }
-                    }
-                }
-                
-                // Set the YouTube video
-                document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${latestYouTubeId}?autoplay=1&loop=1&enablejsapi=1`;
-                
-                // Display posts
-                if (posts.length > 0) {
-                    posts.forEach(post => {
-                        const postDiv = document.createElement('div');
-                        postDiv.className = 'post';
-                        
-                        // Extract date if it's in the first line
-                        const lines = post.content.split('\n');
-                        let dateHtml = '';
-                        let contentStart = 0;
-                        
-                        // Filter out YOUTUBE: lines from display
-                        const displayLines = lines.filter(line => !line.startsWith('YOUTUBE:'));
-                        
-                        // Check if first line looks like a date
-                        if (displayLines[0] && displayLines[0].match(/\d{4}-\d{2}-\d{2}|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER/i)) {
-                            dateHtml = `<div class="post-date">${displayLines[0].toUpperCase()}</div>`;
-                            contentStart = 1;
-                        }
-                        
-                        // Check if second line looks like a title
-                        let titleHtml = '';
-                        if (displayLines[contentStart] && displayLines[contentStart].length > 0 && displayLines[contentStart].length < 100) {
-                            titleHtml = `<div class="post-title">${displayLines[contentStart]}</div>`;
-                            contentStart++;
-                        }
-                        
-                        // Rest is content
-                        const content = displayLines.slice(contentStart).join('\n').trim();
-                        
-                        postDiv.innerHTML = `
-                            ${dateHtml}
-                            ${titleHtml}
-                            <div class="post-content">${content}</div>
-                        `;
-                        
-                        container.appendChild(postDiv);
-                    });
-                } else {
-                    container.innerHTML = '<div class="post"><div class="post-content">No posts found. Add text files named Data_0001.txt, Data_0002.txt, etc. to display content.</div></div>';
-                }
-            } catch (error) {
-                container.innerHTML = '<div class="post"><div class="post-content">Error loading posts: ' + error.message + '</div></div>';
+        // extract youtube line
+        lines.forEach((l,i)=>{
+            if(l.toUpperCase().startsWith('YOUTUBE:')){
+                youtubeId=l.split(':')[1].trim();
+                lines[i]=''; // strip from content
             }
-        }
-        
-        // Load posts on page load
-        loadPosts();
-        
-        // YouTube Player Controls
-        let player;
-        let isPlaying = true;
-        
-        // Load YouTube API
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-        
-        // YouTube API callback
-        window.onYouTubeIframeAPIReady = function() {
-            player = new YT.Player('ytPlayer', {
-                events: {
-                    'onReady': onPlayerReady
-                }
-            });
-        }
-        
-        function onPlayerReady(event) {
-            // Set initial volume
-            player.setVolume(50);
-            
-            // Play/Pause button
-            document.getElementById('playPauseBtn').addEventListener('click', function() {
-                if (isPlaying) {
-                    player.pauseVideo();
-                    this.textContent = 'PLAY';
-                    isPlaying = false;
-                } else {
-                    player.playVideo();
-                    this.textContent = 'PAUSE';
-                    isPlaying = true;
-                }
-            });
-            
-            // Volume slider
-            document.getElementById('volumeSlider').addEventListener('input', function(e) {
-                player.setVolume(e.target.value);
-            });
-        }
-    </script>
+        });
+        const content=lines.slice(cursor).filter(Boolean).join('\n').trim();
+        const postDiv=document.createElement('div');
+        postDiv.className='post';
+        postDiv.dataset.youtube=youtubeId;
+        postDiv.innerHTML=`
+            ${dateHtml}
+            ${titleHtml}
+            <div class="post-content">${content.replace(/\n/g,'<br>')}</div>
+        `;
+        container.appendChild(postDiv);
+        observer.observe(postDiv);
+        if(idx===0 && youtubeId){currentVideoId=youtubeId;} // newest post
+    });
+    // Initialise player if API already loaded
+    if(typeof YT!=='undefined' && YT.Player && !player && currentVideoId){
+        player=new YT.Player('ytPlayer',{
+            videoId:currentVideoId,
+            playerVars:{autoplay:1,loop:1,playlist:currentVideoId,mute:1},
+            events:{}
+        });
+    }
+}
+loadPosts();
+</script>
 </body>
 </html>
