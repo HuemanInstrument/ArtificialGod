@@ -442,7 +442,16 @@
                     }
                 }
                 
-                // DON'T set iframe src here - let YouTube API handle it
+                // NOW load YouTube API after we have the video ID
+                if (!window.YT) {
+                    const tag = document.createElement('script');
+                    tag.src = "https://www.youtube.com/iframe_api";
+                    const firstScriptTag = document.getElementsByTagName('script')[0];
+                    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+                } else {
+                    // If API already loaded, create player directly
+                    onYouTubeIframeAPIReady();
+                }
                 
                 // Display posts
                 if (posts.length > 0) {
@@ -500,12 +509,14 @@
         
         // YouTube API callback
         window.onYouTubeIframeAPIReady = function() {
+            console.log('Creating YouTube player with video:', latestYouTubeId);
             player = new YT.Player('ytPlayer', {
                 videoId: latestYouTubeId,
                 playerVars: {
                     autoplay: 1,
                     loop: 1,
-                    playlist: latestYouTubeId
+                    playlist: latestYouTubeId,
+                    mute: 0  // Ensure not muted
                 },
                 events: {
                     onReady: onPlayerReady,
@@ -566,12 +577,6 @@
         
         // Load posts first
         loadPosts();
-        
-        // Then load YouTube API
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     </script>
 </body>
 </html>
