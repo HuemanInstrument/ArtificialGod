@@ -445,9 +445,11 @@
                         lines.forEach(line => {
                             if (line.startsWith('YOUTUBE:')) {
                                 youtubeId = line.split(':')[1].trim();
+                                console.log('Found YouTube ID in post:', youtubeId); // Debug
                             }
                         });
                         postDiv.dataset.youtube = youtubeId; // Store in data attribute
+                        console.log('Post created with data-youtube:', postDiv.dataset.youtube); // Debug
                         
                         // Filter out YOUTUBE: lines from display
                         const displayLines = lines.filter(line => !line.startsWith('YOUTUBE:'));
@@ -481,6 +483,7 @@
                     });
                     
                     // Set up intersection observer for scrolling
+                    console.log('Setting up scroll observer...'); // Debug
                     setupScrollObserver();
                 } else {
                     container.innerHTML = '<div class="post"><div class="post-content">No posts found. Add text files named Data_0001.txt, Data_0002.txt, etc. to display content.</div></div>';
@@ -496,9 +499,10 @@
             
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                    // Check if entering viewport (not exiting)
+                    if (entry.isIntersecting) {
                         const youtubeId = entry.target.dataset.youtube;
-                        console.log('Post in view, YouTube ID:', youtubeId); // Debug
+                        console.log('Post in view, YouTube ID:', youtubeId, 'Intersection ratio:', entry.intersectionRatio); // Debug
                         
                         if (youtubeId && youtubeId !== currentVideoId) {
                             // Debounce to avoid rapid changes
@@ -508,13 +512,13 @@
                                 currentVideoId = youtubeId;
                                 // Update iframe src directly
                                 document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&playlist=${youtubeId}&controls=1&modestbranding=1`;
-                            }, 500); // Wait 500ms before changing
+                            }, 300); // Wait 300ms before changing
                         }
                     }
                 });
             }, { 
-                threshold: [0.5], // Trigger when 50% visible
-                rootMargin: '-10% 0px -10% 0px' // Add margin to ensure center detection
+                threshold: [0.1, 0.3, 0.5], // Multiple thresholds to catch posts
+                rootMargin: '0px 0px -50% 0px' // Consider post "in view" when it reaches middle of viewport
             });
             
             // Observe all posts
