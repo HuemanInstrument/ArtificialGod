@@ -1,0 +1,52 @@
+△➞ ://0007 Hueman ≈ Instrumentality • [1653] ➞ ▲
+
+Transcription:
+
+Hey everybody, I just wanted to announce something. I've been working on a game for the last three weeks, and there's only about one or two weeks left until I have this thing finished.
+
+And I don't know how to program.
+
+I'm doing this all by vibe coding, right? Which is something that has been around for a while and people have been talking about, but I don't think anybody knows. Well, maybe a few people know, but I think it's mostly unknown that you can completely make a game right now using AI.
+
+I'm actually using Anthropic AI's Claude to do this. It seems to be the best one. Claude is about a hundred dollars a month, just so you know. I think the new Grok is like three hundred dollars a month. It could be better, the new Grok could be better, but I don't know, I haven't tried it.
+
+But yeah, so Claude made the upgrade tower system. This is a turret defense game that I'm making. It made the upgrade system for the towers. He made the gamble system. He made 90 different placement tiles when I explained what I needed. He made the gold and life tracking on the left side, the health bars on the enemies, the stats for every tower, every enemy, as per my instructions, of course.
+
+And when a major bug happened, which was like these projectiles were freezing in midair because like, I would lose all my life points and then the towers would have to be cleared out and there would be projectiles floating like ghost bullets, and they were stuck there permanently. And I was like, I just described that problem to Claude and I showed him the scripts that I had and he fixed it with some tag system that was just brilliant.
+
+And you know what? Like, this is absolutely what it felt like three years ago when I discovered all these open source AI art tools that almost nobody knew about. Tools that if you knew how to utilize them correctly and like curate from them well, you could make some serious money. And I made a decent amount over the last three years doing that.
+
+And that's what this kind of feels like now. It feels like I'm in early on this. Like, most people don't realize that you can literally build entire coherent games right now just by talking with Claude about it, or perhaps Grok or your choice of AI.
+
+And you just sit there and you describe how you want things to be, basically going step by step, building out the vision in your head of some epic video game idea that you have. It's kind of like being the director of a video game project, like in a video game company where you just tell your employees what needs to be done. And you know, you're like the visionary, right?
+
+And I could have chosen a different engine to go with for my game, like I could have chose Godot or Unreal Engine, but I decided to go with Roblox Studio because that would put this game on Xbox, PlayStation, PC immediately. And it's pretty simple games, right? Like Roblox titles are simple for the most part compared to like triple-A titles, right?
+
+And yeah, you know, I just wanted to say like, you could make these games too. And you know, this really could be a good opportunity for people to make like life-changing money.
+
+And you know, you and I, we've probably spent years and years playing video games. We probably have great mental models of what it takes to make a good game or like what makes a good game a good game. And now we can use those models we've developed in our head by playing all these games that we've played throughout our lives and use these mental resources that we built up essentially on the side to make, I don't know, side money, you know? Like we can put it to good use and build new games for the next generation.
+
+And the barrier for entry has just gone. It's just poof, it's just gone. Just gone, man.
+
+And you know, just so you know, you do need to be somewhat well-versed in operating computers, of course, and like folders and some of the more basic stuff revolving around scripting, like where things should go, basic ideas of solutions that might be possible so you can introduce it to Claude and like prompt him into doing the right solutions. Sometimes that's kind of necessary.
+
+But I mean, if you're just starting from scratch, you should be able to work with Claude to figure all that out too. It's not like it's impossible to just start off fresh. And you know, like I said, I only knew HTML from high school. C++, I took C++ in high school, and Claude is just handling all the programming for me. It's really working like a hundred percent, and it's wild.
+
+People just, you know, we're living in a linear society. Like people don't see that AI is exponential and it's unlocking all these new capabilities all the time. We thought this was coming soon, but it's actually here now. And that's what this video is for, is just to let people know. With Claude, I promise you, it's a hundred percent here. At least with Claude, it could be here with some of the others too.
+
+But yeah, you can build games based on your visions that you've always had. And this window to make money won't stay open forever. I'm sure this is early. This is probably as early as it gets, really, as far as making this barrier to entry completely gone. Or rather, it'll become less valuable.
+
+Even me making this video kind of worries me, like that I might be shooting myself in the foot a bit. But whatever, anyone paying attention to my content, I deeply appreciate you. So, and I just wanted to let you know about this.
+
+And yeah, this seems like a huge opportunity. This seems like a massive opportunity. Just like I caught AI art, like just like I caught the AI art wave early, this feels like this is another moment where being early matters. A bit, till the end of the video.
+
+And the video game Roblox economy dwarfs anything in the AI art space, as far as I've seen.
+And just a closing note here, it feels like the future is being built by people who realize what's possible before it becomes obvious to everyone else. If this is something that you think you'll be passionate about, I say go for it.
+
+But yeah, so that's where I'm at. And I just wanted to present that to people, because it feels just like it did three years ago, man, when all these new things were coming out and all these possibilities were arising.
+
+So I hope you go for it, and I hope this video was valuable for you.
+
+First video I've ever done speaking like this, please be gentle 🙏 lol, just trying to get the message out to the homies.
+
+YOUTUBE: KSuiSjov5R8
