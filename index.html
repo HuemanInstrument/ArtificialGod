@@ -219,7 +219,7 @@
             <span class="volume-label">VOLUME:</span>
             <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
         </div>
-        <iframe id="ytPlayer" width="0" height="0" src="" frameborder="0" allow="autoplay"></iframe>
+        <iframe id="ytPlayer" width="0" height="0" frameborder="0" allow="autoplay"></iframe>
     </div>
     
     <script>
@@ -388,12 +388,16 @@
         // Start animation
         animate();
         
+        // YouTube Player Controls
+        let player;
+        let isPlaying = true;
+        let latestYouTubeId = 'yQmmG2JmnEk'; // Default video ID
+        let currentId = '';
+        
         // Load text files
         async function loadPosts() {
             const container = document.getElementById('content');
             container.innerHTML = '';
-            
-            let latestYouTubeId = 'yQmmG2JmnEk'; // Default video ID
             
             try {
                 // Try to load files from Data_0001.txt to Data_9999.txt
@@ -438,14 +442,26 @@
                     }
                 }
                 
-                // Set the YouTube video
-                document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${latestYouTubeId}?autoplay=1&loop=1&enablejsapi=1`;
+                // DON'T set iframe src here - let YouTube API handle it
                 
                 // Display posts
                 if (posts.length > 0) {
                     posts.forEach(post => {
                         const postDiv = document.createElement('div');
                         postDiv.className = 'post';
+                        
+                        // Extract YouTube ID for this post
+                        let postYouTubeId = '';
+                        const allLines = post.content.split('\n');
+                        for (const line of allLines) {
+                            if (line.startsWith('YOUTUBE:')) {
+                                postYouTubeId = line.replace('YOUTUBE:', '').trim();
+                                break;
+                            }
+                        }
+                        
+                        // Store YouTube ID in dataset
+                        postDiv.dataset.youtube = postYouTubeId;
                         
                         // Extract date if it's in the first line
                         const lines = post.content.split('\n');
@@ -479,6 +495,9 @@
                         
                         container.appendChild(postDiv);
                     });
+                    
+                    // Set up intersection observer for scroll-based video switching
+                    setupIntersectionObserver();
                 } else {
                     container.innerHTML = '<div class="post"><div class="post-content">No posts found. Add text files named Data_0001.txt, Data_0002.txt, etc. to display content.</div></div>';
                 }
@@ -490,10 +509,6 @@
         // Load posts on page load
         loadPosts();
         
-        // YouTube Player Controls
-        let player;
-        let isPlaying = true;
-        
         // Load YouTube API
         const tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
@@ -503,10 +518,21 @@
         // YouTube API callback
         window.onYouTubeIframeAPIReady = function() {
             player = new YT.Player('ytPlayer', {
+                videoId: latestYouTubeId,
+                playerVars: {
+                    'autoplay': 1,
+                    'loop': 1,
+                    'playlist': latestYouTubeId,
+                    'controls': 0,
+                    'showinfo': 0,
+                    'modestbranding': 1
+                },
                 events: {
-                    'onReady': onPlayerReady
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
                 }
             });
+            currentId = latestYouTubeId;
         }
         
         function onPlayerReady(event) {
@@ -515,20 +541,51 @@
             
             // Play/Pause button
             document.getElementById('playPauseBtn').addEventListener('click', function() {
-                if (isPlaying) {
+                if (player.getPlayerState() === YT.PlayerState.PLAYING) {
                     player.pauseVideo();
-                    this.textContent = 'PLAY';
-                    isPlaying = false;
                 } else {
                     player.playVideo();
-                    this.textContent = 'PAUSE';
-                    isPlaying = true;
                 }
             });
             
             // Volume slider
             document.getElementById('volumeSlider').addEventListener('input', function(e) {
                 player.setVolume(e.target.value);
+            });
+        }
+        
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                document.getElementById('playPauseBtn').textContent = 'PAUSE';
+                isPlaying = true;
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                document.getElementById('playPauseBtn').textContent = 'PLAY';
+                isPlaying = false;
+            }
+        }
+        
+        // Intersection Observer for scroll-based video switching
+        function setupIntersectionObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.dataset.youtube;
+                        if (id && id !== currentId && player && player.loadVideoById) {
+                            currentId = id;
+                            player.loadVideoById({
+                                videoId: id,
+                                loop: 1
+                            });
+                        }
+                    }
+                });
+            }, {
+                threshold: 0.6 // Post needs to be 60% visible
+            });
+            
+            // Observe all posts
+            document.querySelectorAll('.post').forEach(post => {
+                observer.observe(post);
             });
         }
     </script>
