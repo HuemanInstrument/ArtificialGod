@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hueman Instrumentality</title>
+    <title>ArtificialGod.org</title>
     <style>
         * {
             margin: 0;
@@ -20,54 +20,30 @@
             overflow-x: hidden;
         }
         
-        /* Header */
-        .header {
-            background-color: #000;
-            padding: 15px 20px;
-            position: fixed;
+        /* Langton's Ant Header */
+        .langtons-header {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            overflow: hidden;
+            z-index: 10;
+        }
+        
+        #langtonsCanvas {
+            position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            z-index: 1000;
-            border-bottom: 1px solid #fff;
-        }
-        
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .site-title {
-            font-size: 14px;
-            font-weight: normal;
-            letter-spacing: 1px;
-        }
-        
-        .social-links {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .social-links a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 11px;
-            opacity: 0.7;
-            transition: opacity 0.3s;
-        }
-        
-        .social-links a:hover {
-            opacity: 1;
+            width: 100%;
+            height: 100%;
         }
         
         /* Background canvas */
         #distortionCanvas {
             position: fixed;
-            top: 50px;
+            top: 0;
             left: 0;
             width: 100%;
-            height: calc(100% - 50px);
+            height: 100%;
             z-index: -1;
         }
         
@@ -75,7 +51,7 @@
         .container {
             max-width: 480px;
             margin: 0 auto;
-            padding: 80px 20px 100px;
+            padding: 125px 20px 100px;
             background-color: rgba(0, 0, 0, 0.85);
             min-height: 100vh;
         }
@@ -121,6 +97,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 1000;
         }
         
         .audio-controls {
@@ -186,21 +163,9 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <h1 class="site-title">HUEMAN INSTRUMENTALITY</h1>
-            <nav class="social-links">
-                <a href="https://www.tiktok.com/@huemaninstrument">TIK</a>
-                <a href="https://www.facebook.com/HuemanInstrument">FB</a>
-                <a href="https://www.youtube.com/@HuemanInstrumentality">YT</a>
-                <a href="https://www.instagram.com/huemaninstrument/">IG</a>
-                <a href="https://www.tumblr.com/hueman-instrumentality">TMB</a>
-                <a href="https://www.pinterest.com/HuemanInstrumentality/">PIN</a>
-                <a href="https://truthsocial.com/@HuemanInstrumentality">TRU</a>
-                <a href="https://x.com/EuclideanPlane">X</a>
-                <a href="https://bsky.app/profile/huemaninstrument.bsky.social">BSK</a>
-            </nav>
-        </div>
+    <!-- Langton's Ant Animation Header -->
+    <div class="langtons-header">
+        <canvas id="langtonsCanvas"></canvas>
     </div>
     
     <canvas id="distortionCanvas"></canvas>
@@ -214,6 +179,145 @@
     </div>
     
     <script>
+        // Langton's Ant Animation
+        const langtonsCanvas = document.getElementById('langtonsCanvas');
+        const langtonsCtx = langtonsCanvas.getContext('2d');
+        
+        // Configuration
+        const cellSize = 4;
+        let grid;
+        let ants = [];
+        let gridWidth, gridHeight;
+        
+        // Text to display
+        const text = "Artificial God . Org";
+        
+        function initLangtonsAnt() {
+            langtonsCanvas.width = window.innerWidth;
+            langtonsCanvas.height = 120;
+            
+            gridWidth = Math.floor(langtonsCanvas.width / cellSize);
+            gridHeight = Math.floor(langtonsCanvas.height / cellSize);
+            
+            // Initialize grid (all white initially)
+            grid = new Array(gridHeight).fill(null).map(() => new Array(gridWidth).fill(0));
+            
+            // Create text bitmap
+            langtonsCtx.clearRect(0, 0, langtonsCanvas.width, langtonsCanvas.height);
+            
+            langtonsCtx.fillStyle = 'white';
+            langtonsCtx.font = 'bold 32px Arial';
+            langtonsCtx.textAlign = 'center';
+            langtonsCtx.textBaseline = 'middle';
+            
+            // Draw the text to get its position
+            const textX = langtonsCanvas.width / 2;
+            const textY = langtonsCanvas.height / 2;
+            langtonsCtx.fillText(text, textX, textY);
+            
+            // Find the position of the dot in ". org"
+            const metrics = langtonsCtx.measureText("Artificial God ");
+            const dotX = textX - (langtonsCtx.measureText(text).width / 2) + metrics.width;
+            
+            // Sample the canvas to create initial grid state
+            const imageData = langtonsCtx.getImageData(0, 0, langtonsCanvas.width, langtonsCanvas.height);
+            for (let y = 0; y < gridHeight; y++) {
+                for (let x = 0; x < gridWidth; x++) {
+                    const canvasX = x * cellSize + cellSize / 2;
+                    const canvasY = y * cellSize + cellSize / 2;
+                    const index = (Math.floor(canvasY) * langtonsCanvas.width + Math.floor(canvasX)) * 4;
+                    // If pixel is white (text), set grid cell to 1
+                    if (imageData.data[index] > 128) {
+                        grid[y][x] = 1;
+                    }
+                }
+            }
+            
+            // Initialize single ant at the dot position
+            const antX = Math.floor(dotX / cellSize);
+            const antY = Math.floor(textY / cellSize);
+            
+            ants = [{
+                x: antX,
+                y: antY,
+                direction: 0 // 0: up, 1: right, 2: down, 3: left
+            }];
+            
+            // Draw the initial state immediately
+            langtonsCtx.clearRect(0, 0, langtonsCanvas.width, langtonsCanvas.height);
+            
+            for (let y = 0; y < gridHeight; y++) {
+                for (let x = 0; x < gridWidth; x++) {
+                    if (grid[y][x] === 1) {
+                        langtonsCtx.fillStyle = 'white';
+                        langtonsCtx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+            
+            // Draw the initial ant position
+            langtonsCtx.fillStyle = 'white';
+            langtonsCtx.fillRect(antX * cellSize - 2, antY * cellSize - 2, cellSize + 4, cellSize + 4);
+            langtonsCtx.fillStyle = '#ff0000';
+            langtonsCtx.fillRect(antX * cellSize - 1, antY * cellSize - 1, cellSize + 2, cellSize + 2);
+        }
+        
+        function updateLangtonsAnt() {
+            // Update each ant
+            ants.forEach(ant => {
+                if (ant.x >= 0 && ant.x < gridWidth && ant.y >= 0 && ant.y < gridHeight) {
+                    // Get current cell color
+                    const currentColor = grid[ant.y][ant.x];
+                    
+                    // Apply Langton's Ant rules
+                    if (currentColor === 0) { // Empty/dark cell
+                        // Turn right
+                        ant.direction = (ant.direction + 1) % 4;
+                    } else { // White cell
+                        // Turn left
+                        ant.direction = (ant.direction + 3) % 4;
+                    }
+                    
+                    // Flip the color
+                    grid[ant.y][ant.x] = 1 - currentColor;
+                    
+                    // Move forward
+                    switch (ant.direction) {
+                        case 0: ant.y--; break; // Up
+                        case 1: ant.x++; break; // Right
+                        case 2: ant.y++; break; // Down
+                        case 3: ant.x--; break; // Left
+                    }
+                }
+            });
+            
+            // Draw the grid
+            langtonsCtx.clearRect(0, 0, langtonsCanvas.width, langtonsCanvas.height);
+            
+            for (let y = 0; y < gridHeight; y++) {
+                for (let x = 0; x < gridWidth; x++) {
+                    if (grid[y][x] === 1) {
+                        langtonsCtx.fillStyle = 'white';
+                        langtonsCtx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+            
+            // Draw ant
+            if (ants[0] && ants[0].x >= 0 && ants[0].x < gridWidth && ants[0].y >= 0 && ants[0].y < gridHeight) {
+                // White outline for visibility
+                langtonsCtx.fillStyle = 'white';
+                langtonsCtx.fillRect(ants[0].x * cellSize - 2, ants[0].y * cellSize - 2, cellSize + 4, cellSize + 4);
+                // Red ant
+                langtonsCtx.fillStyle = '#ff0000';
+                langtonsCtx.fillRect(ants[0].x * cellSize - 1, ants[0].y * cellSize - 1, cellSize + 2, cellSize + 2);
+            }
+        }
+        
+        // Initialize and start Langton's Ant animation
+        initLangtonsAnt();
+        setInterval(updateLangtonsAnt, 100); // Update every 100ms
+        
         // Canvas setup
         const canvas = document.getElementById('distortionCanvas');
         const ctx = canvas.getContext('2d');
@@ -230,7 +334,7 @@
         // Resize canvas
         function resizeCanvas() {
             canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight - 50;
+            canvas.height = window.innerHeight;
             
             // Calculate grid dimensions with extra margin
             cols = Math.ceil(canvas.width / gridSize) + 4;
@@ -368,7 +472,10 @@
         }
         
         // Initialize
-        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initLangtonsAnt();
+        });
         resizeCanvas();
         
         // Start with some lenses
