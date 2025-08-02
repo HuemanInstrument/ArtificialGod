@@ -603,6 +603,7 @@
         // Set up scroll observer
 // Set up scroll observer
 // Set up scroll observer
+// Set up scroll observer
 function setupScrollObserver() {
     window.addEventListener('scroll', () => {
         const posts = document.querySelectorAll('.post[data-youtube]');
@@ -610,10 +611,9 @@ function setupScrollObserver() {
         
         posts.forEach(post => {
             const rect = post.getBoundingClientRect();
-            const postCenter = rect.top + (rect.height / 2);
             
-            // If this post's center is closest to window center
-            if (Math.abs(postCenter - windowCenter) < 100) {
+            // If the top of the post is near the middle of screen
+            if (rect.top < windowCenter && rect.bottom > windowCenter) {
                 const youtubeId = post.dataset.youtube;
                 if (youtubeId && youtubeId !== currentVideoId) {
                     currentVideoId = youtubeId;
@@ -629,6 +629,7 @@ function setupScrollObserver() {
     </script>
 </body>
 </html>
+
 
 
 
