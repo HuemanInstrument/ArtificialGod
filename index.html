@@ -601,45 +601,30 @@
         }
         
         // Set up scroll observer
-        function setupScrollObserver() {
-            let debounceTimer;
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    // Check if entering viewport (not exiting)
-                    if (entry.isIntersecting) {
-                        const youtubeId = entry.target.dataset.youtube;
-                        console.log('Post in view, YouTube ID:', youtubeId, 'Intersection ratio:', entry.intersectionRatio); // Debug
-                        
-                        if (youtubeId && youtubeId !== currentVideoId) {
-                            // Debounce to avoid rapid changes
-                            clearTimeout(debounceTimer);
-                            debounceTimer = setTimeout(() => {
-                                console.log('Changing video to:', youtubeId); // Debug
-                                currentVideoId = youtubeId;
-                                // Update iframe src directly
-                                document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&playlist=${youtubeId}&controls=1&modestbranding=1`;
-                            }, 300); // Wait 300ms before changing
-                        }
-                    }
-                });
-            }, { 
-                threshold: [0.01, 0.05, 0.1], // Multiple thresholds to catch posts
-                rootMargin: '0px 0px -50% 0px' // Consider post "in view" when it reaches middle of viewport
-            });
-            
-            // Observe all posts
-            document.querySelectorAll('.post').forEach(post => {
-                if (post.dataset.youtube) {
-                    console.log('Observing post with YouTube ID:', post.dataset.youtube); // Debug
-                    observer.observe(post);
-                }
-            });
+// Set up scroll observer
+window.addEventListener('scroll', () => {
+    const posts = document.querySelectorAll('.post[data-youtube]');
+    const windowCenter = window.innerHeight / 2;
+    
+    posts.forEach(post => {
+        const rect = post.getBoundingClientRect();
+        const postCenter = rect.top + (rect.height / 2);
+        
+        // If this post's center is closest to window center
+        if (Math.abs(postCenter - windowCenter) < 100) {
+            const youtubeId = post.dataset.youtube;
+            if (youtubeId && youtubeId !== currentVideoId) {
+                currentVideoId = youtubeId;
+                document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&playlist=${youtubeId}&controls=1&modestbranding=1`;
+            }
         }
+    });
+});
         
         // Load posts
         loadPosts();
     </script>
 </body>
 </html>
+
 
