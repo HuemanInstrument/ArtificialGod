@@ -602,29 +602,33 @@
         
         // Set up scroll observer
 // Set up scroll observer
-window.addEventListener('scroll', () => {
-    const posts = document.querySelectorAll('.post[data-youtube]');
-    const windowCenter = window.innerHeight / 2;
-    
-    posts.forEach(post => {
-        const rect = post.getBoundingClientRect();
-        const postCenter = rect.top + (rect.height / 2);
+// Set up scroll observer
+function setupScrollObserver() {
+    window.addEventListener('scroll', () => {
+        const posts = document.querySelectorAll('.post[data-youtube]');
+        const windowCenter = window.innerHeight / 2;
         
-        // If this post's center is closest to window center
-        if (Math.abs(postCenter - windowCenter) < 100) {
-            const youtubeId = post.dataset.youtube;
-            if (youtubeId && youtubeId !== currentVideoId) {
-                currentVideoId = youtubeId;
-                document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&playlist=${youtubeId}&controls=1&modestbranding=1`;
+        posts.forEach(post => {
+            const rect = post.getBoundingClientRect();
+            const postCenter = rect.top + (rect.height / 2);
+            
+            // If this post's center is closest to window center
+            if (Math.abs(postCenter - windowCenter) < 100) {
+                const youtubeId = post.dataset.youtube;
+                if (youtubeId && youtubeId !== currentVideoId) {
+                    currentVideoId = youtubeId;
+                    document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&playlist=${youtubeId}&controls=1&modestbranding=1`;
+                }
             }
-        }
+        });
     });
-});
+}
         
         // Load posts
         loadPosts();
     </script>
 </body>
 </html>
+
 
 
