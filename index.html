@@ -501,7 +501,7 @@
                 let consecutiveFailures = 0;
                 
                 // Keep trying to load files until we get 5 consecutive failures
-                while (consecutiveFailures < 5 && fileNumber < 1000) {
+                while (consecutiveFailures < 200 && fileNumber < 1000) {
                     const fileName = `Data_${String(fileNumber).padStart(4, '0')}.txt`;
                     
                     try {
@@ -629,6 +629,7 @@ function setupScrollObserver() {
     </script>
 </body>
 </html>
+
 
 
 
