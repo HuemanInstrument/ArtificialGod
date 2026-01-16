@@ -489,112 +489,127 @@
         // YouTube Player Controls
         let currentVideoId = 'yQmmG2JmnEk'; // Default
         
-// Load text files
-async function loadPosts() {
-    const container = document.getElementById('content');
-    container.innerHTML = '';
-    
-    try {
-        const posts = [];
-        
-        // Try every number up to the max, regardless of gaps
-        for (let fileNumber = 1; fileNumber <= 500; fileNumber++) {
-            const fileName = `Data_${String(fileNumber).padStart(4, '0')}.txt`;
+        // Load text files
+        async function loadPosts() {
+            const container = document.getElementById('content');
+            container.innerHTML = '';
+            
             try {
-                const response = await fetch(fileName);
-                if (response.ok) {
-                    const text = await response.text();
-                    posts.push({ number: fileNumber, content: text, fileName: fileName });
+                const posts = [];
+                
+                // Try every number up to the max, regardless of gaps
+                for (let fileNumber = 1; fileNumber <= 500; fileNumber++) {
+                    const fileName = `Data_${String(fileNumber).padStart(4, '0')}.txt`;
+                    try {
+                        const response = await fetch(fileName);
+                        if (response.ok) {
+                            const text = await response.text();
+                            posts.push({ number: fileNumber, content: text, fileName: fileName });
+                        }
+                    } catch (error) {
+                        // Just skip missing files
+                    }
+                }
+                
+                // Sort posts by number (descending - highest first)
+                posts.sort((a, b) => b.number - a.number);
+                
+                // Check for YouTube ID in the most recent post
+                if (posts.length > 0) {
+                    const lines = posts[0].content.split('\n');
+                    for (const line of lines) {
+                        if (line.startsWith('YOUTUBE:')) {
+                            const youtubeId = line.replace('YOUTUBE:', '').trim();
+                            if (youtubeId) {
+                                currentVideoId = youtubeId;
+                            }
+                            break;
+                        }
+                    }
+                }
+                
+                // Set the YouTube video directly in iframe
+                document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${currentVideoId}?autoplay=1&loop=1&playlist=${currentVideoId}&controls=1&modestbranding=1`;
+                
+                // Display posts
+                if (posts.length > 0) {
+                    posts.forEach(post => {
+                        const postDiv = document.createElement('div');
+                        postDiv.className = 'post';
+                        
+                        // Extract YouTube ID for this post
+                        let youtubeId = '';
+                        const lines = post.content.split('\n');
+                        lines.forEach(line => {
+                            if (line.startsWith('YOUTUBE:')) {
+                                youtubeId = line.split(':')[1].trim();
+                            }
+                        });
+                        postDiv.dataset.youtube = youtubeId;
+                        
+                        // Filter out YOUTUBE: lines from display
+                        const displayLines = lines.filter(line => !line.startsWith('YOUTUBE:'));
+                        
+                        let dateHtml = '';
+                        let contentStart = 0;
+                        
+                        // Check if first line looks like a date
+                        if (displayLines[0] && displayLines[0].match(/\d{4}-\d{2}-\d{2}|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER/i)) {
+                            dateHtml = `<div class="post-date">${displayLines[0].toUpperCase()}</div>`;
+                            contentStart = 1;
+                        }
+                        
+                        // Check if second line looks like a title
+                        let titleHtml = '';
+                        if (displayLines[contentStart] && displayLines[contentStart].length > 0 && displayLines[contentStart].length < 100) {
+                            titleHtml = `<div class="post-title">${displayLines[contentStart]}</div>`;
+                            contentStart++;
+                        }
+                        
+                        // Rest is content
+                        const content = displayLines.slice(contentStart).join('\n').trim();
+                        
+                        postDiv.innerHTML = `
+                            ${dateHtml}
+                            ${titleHtml}
+                            <div class="post-content">${content}</div>
+                        `;
+                        
+                        container.appendChild(postDiv);
+                    });
+                    
+                    setupScrollObserver();
+                } else {
+                    container.innerHTML = '<div class="post"><div class="post-content">No posts found. Add text files named Data_0001.txt, Data_0002.txt, etc. to display content.</div></div>';
                 }
             } catch (error) {
-                // Just skip missing files
+                container.innerHTML = '<div class="post"><div class="post-content">Error loading posts: ' + error.message + '</div></div>';
             }
         }
         
-        // Sort posts by number (descending - highest first)
-        posts.sort((a, b) => b.number - a.number);
-        
-        // Check for YouTube ID in the most recent post
-        if (posts.length > 0) {
-            const lines = posts[0].content.split('\n');
-            for (const line of lines) {
-                if (line.startsWith('YOUTUBE:')) {
-                    const youtubeId = line.replace('YOUTUBE:', '').trim();
-                    if (youtubeId) {
-                        currentVideoId = youtubeId;
-                    }
-                    break;
-                }
-            }
-        }
-        
-        // Set the YouTube video directly in iframe
-        document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${currentVideoId}?autoplay=1&loop=1&playlist=${currentVideoId}&controls=1&modestbranding=1`;
-        
-        // Display posts
-        if (posts.length > 0) {
-            posts.forEach(post => {
-                const postDiv = document.createElement('div');
-                postDiv.className = 'post';
+        // Set up scroll observer
+        function setupScrollObserver() {
+            window.addEventListener('scroll', () => {
+                const posts = document.querySelectorAll('.post[data-youtube]');
+                const windowCenter = window.innerHeight / 2;
                 
-                // Extract YouTube ID for this post
-                let youtubeId = '';
-                const lines = post.content.split('\n');
-                lines.forEach(line => {
-                    if (line.startsWith('YOUTUBE:')) {
-                        youtubeId = line.split(':')[1].trim();
+                posts.forEach(post => {
+                    const rect = post.getBoundingClientRect();
+                    
+                    // If the top of the post is near the middle of screen
+                    if (rect.top < windowCenter && rect.bottom > windowCenter) {
+                        const youtubeId = post.dataset.youtube;
+                        if (youtubeId && youtubeId !== currentVideoId) {
+                            currentVideoId = youtubeId;
+                            document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&playlist=${youtubeId}&controls=1&modestbranding=1`;
+                        }
                     }
                 });
-                postDiv.dataset.youtube = youtubeId;
-                
-                // Filter out YOUTUBE: lines from display
-                const displayLines = lines.filter(line => !line.startsWith('YOUTUBE:'));
-                
-                let dateHtml = '';
-                let contentStart = 0;
-                
-                // Check if first line looks like a date
-                if (displayLines[0] && displayLines[0].match(/\d{4}-\d{2}-\d{2}|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER/i)) {
-                    dateHtml = `<div class="post-date">${displayLines[0].toUpperCase()}</div>`;
-                    contentStart = 1;
-                }
-                
-                // Check if second line looks like a title
-                let titleHtml = '';
-                if (displayLines[contentStart] && displayLines[contentStart].length > 0 && displayLines[contentStart].length < 100) {
-                    titleHtml = `<div class="post-title">${displayLines[contentStart]}</div>`;
-                    contentStart++;
-                }
-                
-                // Rest is content
-                const content = displayLines.slice(contentStart).join('\n').trim();
-                
-                postDiv.innerHTML = `
-                    ${dateHtml}
-                    ${titleHtml}
-                    <div class="post-content">${content}</div>
-                `;
-                
-                container.appendChild(postDiv);
             });
-            
-            setupScrollObserver();
-        } else {
-            container.innerHTML = '<div class="post"><div class="post-content">No posts found. Add text files named Data_0001.txt, Data_0002.txt, etc. to display content.</div></div>';
         }
-    } catch (error) {
-        container.innerHTML = '<div class="post"><div class="post-content">Error loading posts: ' + error.message + '</div></div>';
-    }
-}
         
         // Load posts
         loadPosts();
     </script>
 </body>
 </html>
-
-
-
-
-
-
