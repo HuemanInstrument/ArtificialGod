@@ -101,7 +101,7 @@
         }
         
         .audio-controls {
-            display: none; /* Hide our custom controls */
+            display: none;
         }
         
         .play-pause-btn {
@@ -183,13 +183,11 @@
         const langtonsCanvas = document.getElementById('langtonsCanvas');
         const langtonsCtx = langtonsCanvas.getContext('2d');
         
-        // Configuration
         const cellSize = 4;
         let grid;
         let ants = [];
         let gridWidth, gridHeight;
         
-        // Text to display
         const text = "Artificial God . Org";
         
         function initLangtonsAnt() {
@@ -199,10 +197,8 @@
             gridWidth = Math.floor(langtonsCanvas.width / cellSize);
             gridHeight = Math.floor(langtonsCanvas.height / cellSize);
             
-            // Initialize grid (all white initially)
             grid = new Array(gridHeight).fill(null).map(() => new Array(gridWidth).fill(0));
             
-            // Create text bitmap
             langtonsCtx.clearRect(0, 0, langtonsCanvas.width, langtonsCanvas.height);
             
             langtonsCtx.fillStyle = 'white';
@@ -210,40 +206,34 @@
             langtonsCtx.textAlign = 'center';
             langtonsCtx.textBaseline = 'middle';
             
-            // Draw the text to get its position
             const textX = langtonsCanvas.width / 2;
             const textY = langtonsCanvas.height / 2;
             langtonsCtx.fillText(text, textX, textY);
             
-            // Find the position of the dot in ". org"
             const metrics = langtonsCtx.measureText("Artificial God ");
             const dotX = textX - (langtonsCtx.measureText(text).width / 2) + metrics.width;
             
-            // Sample the canvas to create initial grid state
             const imageData = langtonsCtx.getImageData(0, 0, langtonsCanvas.width, langtonsCanvas.height);
             for (let y = 0; y < gridHeight; y++) {
                 for (let x = 0; x < gridWidth; x++) {
                     const canvasX = x * cellSize + cellSize / 2;
                     const canvasY = y * cellSize + cellSize / 2;
                     const index = (Math.floor(canvasY) * langtonsCanvas.width + Math.floor(canvasX)) * 4;
-                    // If pixel is white (text), set grid cell to 1
                     if (imageData.data[index] > 128) {
                         grid[y][x] = 1;
                     }
                 }
             }
             
-            // Initialize single ant at the dot position
             const antX = Math.floor(dotX / cellSize);
             const antY = Math.floor(textY / cellSize);
             
             ants = [{
                 x: antX,
                 y: antY,
-                direction: 0 // 0: up, 1: right, 2: down, 3: left
+                direction: 0
             }];
             
-            // Draw the initial state immediately
             langtonsCtx.clearRect(0, 0, langtonsCanvas.width, langtonsCanvas.height);
             
             for (let y = 0; y < gridHeight; y++) {
@@ -255,7 +245,6 @@
                 }
             }
             
-            // Draw the initial ant position
             langtonsCtx.fillStyle = 'white';
             langtonsCtx.fillRect(antX * cellSize - 2, antY * cellSize - 2, cellSize + 4, cellSize + 4);
             langtonsCtx.fillStyle = '#ff0000';
@@ -263,35 +252,27 @@
         }
         
         function updateLangtonsAnt() {
-            // Update each ant
             ants.forEach(ant => {
                 if (ant.x >= 0 && ant.x < gridWidth && ant.y >= 0 && ant.y < gridHeight) {
-                    // Get current cell color
                     const currentColor = grid[ant.y][ant.x];
                     
-                    // Apply Langton's Ant rules
-                    if (currentColor === 0) { // Empty/dark cell
-                        // Turn right
+                    if (currentColor === 0) {
                         ant.direction = (ant.direction + 1) % 4;
-                    } else { // White cell
-                        // Turn left
+                    } else {
                         ant.direction = (ant.direction + 3) % 4;
                     }
                     
-                    // Flip the color
                     grid[ant.y][ant.x] = 1 - currentColor;
                     
-                    // Move forward
                     switch (ant.direction) {
-                        case 0: ant.y--; break; // Up
-                        case 1: ant.x++; break; // Right
-                        case 2: ant.y++; break; // Down
-                        case 3: ant.x--; break; // Left
+                        case 0: ant.y--; break;
+                        case 1: ant.x++; break;
+                        case 2: ant.y++; break;
+                        case 3: ant.x--; break;
                     }
                 }
             });
             
-            // Draw the grid
             langtonsCtx.clearRect(0, 0, langtonsCanvas.width, langtonsCanvas.height);
             
             for (let y = 0; y < gridHeight; y++) {
@@ -303,44 +284,35 @@
                 }
             }
             
-            // Draw ant
             if (ants[0] && ants[0].x >= 0 && ants[0].x < gridWidth && ants[0].y >= 0 && ants[0].y < gridHeight) {
-                // White outline for visibility
                 langtonsCtx.fillStyle = 'white';
                 langtonsCtx.fillRect(ants[0].x * cellSize - 2, ants[0].y * cellSize - 2, cellSize + 4, cellSize + 4);
-                // Red ant
                 langtonsCtx.fillStyle = '#ff0000';
                 langtonsCtx.fillRect(ants[0].x * cellSize - 1, ants[0].y * cellSize - 1, cellSize + 2, cellSize + 2);
             }
         }
         
-        // Initialize and start Langton's Ant animation
         initLangtonsAnt();
-        setInterval(updateLangtonsAnt, 100); // Update every 100ms
+        setInterval(updateLangtonsAnt, 100);
         
-        // Canvas setup
         const canvas = document.getElementById('distortionCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Grid vertices
         let vertices = [];
         let lenses = [];
-        let gridSize = 25; // Smaller squares
+        let gridSize = 25;
         let cols, rows;
         let scrollOffset = 0;
         let time = 0;
         let lastLensTime = 0;
         
-        // Resize canvas
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             
-            // Calculate grid dimensions with extra margin
             cols = Math.ceil(canvas.width / gridSize) + 4;
             rows = Math.ceil(canvas.height / gridSize) + 4;
             
-            // Initialize vertices
             vertices = [];
             for (let i = 0; i <= cols; i++) {
                 vertices[i] = [];
@@ -357,13 +329,12 @@
             }
         }
         
-        // Lens class
         class Lens {
             constructor() {
-                this.radius = (Math.random() * 15 + 10) * 25; // Adjusted for smaller grid
+                this.radius = (Math.random() * 15 + 10) * 25;
                 this.x = Math.random() * canvas.width;
                 this.y = -this.radius;
-                this.speed = (Math.random() * 0.3 + 0.3); // Slower speed
+                this.speed = (Math.random() * 0.3 + 0.3);
                 this.drift = (Math.random() - 0.5) * 0.2;
             }
             
@@ -373,18 +344,15 @@
                 return this.y < canvas.height + this.radius;
             }
             
-            // Apply lens distortion to a vertex
             distortVertex(vertex) {
-                const dx = vertex.x - this.x;  // Use current position, not original
-                const dy = vertex.y - this.y;  // Use current position, not original
+                const dx = vertex.x - this.x;
+                const dy = vertex.y - this.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
                 if (distance < this.radius) {
-                    // Lens magnification effect
                     const factor = 1 - (distance / this.radius);
-                    const magnification = Math.pow(factor, 2) * 0.5; // Smooth falloff
+                    const magnification = Math.pow(factor, 2) * 0.5;
                     
-                    // Push vertices away from center (magnify)
                     const angle = Math.atan2(dy, dx);
                     const push = distance * magnification;
                     
@@ -394,19 +362,15 @@
             }
         }
         
-        // Animation function
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Update scroll offset for continuous movement - 4x slower
             scrollOffset += 0.075;
             
-            // Smooth wrapping without jumps
             if (scrollOffset >= gridSize * 2) {
                 scrollOffset -= gridSize * 2;
             }
             
-            // Reset vertices to original positions with scroll offset
             for (let i = 0; i <= cols; i++) {
                 for (let j = 0; j <= rows; j++) {
                     const vertex = vertices[i][j];
@@ -415,19 +379,16 @@
                 }
             }
             
-            // Apply lens distortions
             for (let i = 0; i <= cols; i++) {
                 for (let j = 0; j <= rows; j++) {
                     const vertex = vertices[i][j];
                     
-                    // Apply each lens effect
                     for (const lens of lenses) {
                         lens.distortVertex(vertex);
                     }
                 }
             }
             
-            // Draw distorted checkerboard
             ctx.fillStyle = '#000011';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
@@ -438,9 +399,7 @@
                     const p3 = vertices[i + 1][j + 1];
                     const p4 = vertices[i][j + 1];
                     
-                    // Determine if this should be a dark square
                     const offsetSquares = Math.floor(scrollOffset / gridSize);
-                    const fractionalOffset = (scrollOffset % gridSize) / gridSize;
                     const isDark = ((i + j + offsetSquares * 2) % 2) === 0;
                     
                     if (isDark) {
@@ -456,11 +415,9 @@
                 }
             }
             
-            // Update lenses
             lenses = lenses.filter(lens => lens.update());
             
-            // Add new lenses with better timing
-            if (time - lastLensTime > 180 && lenses.length < 3) { // 3 seconds minimum between lenses
+            if (time - lastLensTime > 180 && lenses.length < 3) {
                 if (Math.random() < 0.3) {
                     lenses.push(new Lens());
                     lastLensTime = time;
@@ -471,25 +428,25 @@
             requestAnimationFrame(animate);
         }
         
-        // Initialize
         window.addEventListener('resize', () => {
             resizeCanvas();
             initLangtonsAnt();
         });
         resizeCanvas();
         
-        // Start with some lenses
         for (let i = 0; i < 2; i++) {
             setTimeout(() => lenses.push(new Lens()), i * 2000);
         }
         
-        // Start animation
         animate();
         
-        // YouTube Player Controls
-        let currentVideoId = 'yQmmG2JmnEk'; // Default
+        let currentVideoId = 'yQmmG2JmnEk';
         
-        // Load text files
+        // ========================================
+        // HARDCODED FILE LIST - ADD NEW FILES HERE
+        // ========================================
+        const fileNumbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,35,39,41,42,187];
+        
         async function loadPosts() {
             const container = document.getElementById('content');
             container.innerHTML = '';
@@ -497,8 +454,7 @@
             try {
                 const posts = [];
                 
-                // Try every number up to the max, regardless of gaps
-                for (let fileNumber = 1; fileNumber <= 500; fileNumber++) {
+                for (const fileNumber of fileNumbers) {
                     const fileName = `Data_${String(fileNumber).padStart(4, '0')}.txt`;
                     try {
                         const response = await fetch(fileName);
@@ -507,14 +463,12 @@
                             posts.push({ number: fileNumber, content: text, fileName: fileName });
                         }
                     } catch (error) {
-                        // Just skip missing files
+                        // Skip missing files
                     }
                 }
                 
-                // Sort posts by number (descending - highest first)
                 posts.sort((a, b) => b.number - a.number);
                 
-                // Check for YouTube ID in the most recent post
                 if (posts.length > 0) {
                     const lines = posts[0].content.split('\n');
                     for (const line of lines) {
@@ -528,16 +482,13 @@
                     }
                 }
                 
-                // Set the YouTube video directly in iframe
                 document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${currentVideoId}?autoplay=1&loop=1&playlist=${currentVideoId}&controls=1&modestbranding=1`;
                 
-                // Display posts
                 if (posts.length > 0) {
                     posts.forEach(post => {
                         const postDiv = document.createElement('div');
                         postDiv.className = 'post';
                         
-                        // Extract YouTube ID for this post
                         let youtubeId = '';
                         const lines = post.content.split('\n');
                         lines.forEach(line => {
@@ -547,26 +498,22 @@
                         });
                         postDiv.dataset.youtube = youtubeId;
                         
-                        // Filter out YOUTUBE: lines from display
                         const displayLines = lines.filter(line => !line.startsWith('YOUTUBE:'));
                         
                         let dateHtml = '';
                         let contentStart = 0;
                         
-                        // Check if first line looks like a date
                         if (displayLines[0] && displayLines[0].match(/\d{4}-\d{2}-\d{2}|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER/i)) {
                             dateHtml = `<div class="post-date">${displayLines[0].toUpperCase()}</div>`;
                             contentStart = 1;
                         }
                         
-                        // Check if second line looks like a title
                         let titleHtml = '';
                         if (displayLines[contentStart] && displayLines[contentStart].length > 0 && displayLines[contentStart].length < 100) {
                             titleHtml = `<div class="post-title">${displayLines[contentStart]}</div>`;
                             contentStart++;
                         }
                         
-                        // Rest is content
                         const content = displayLines.slice(contentStart).join('\n').trim();
                         
                         postDiv.innerHTML = `
@@ -580,14 +527,13 @@
                     
                     setupScrollObserver();
                 } else {
-                    container.innerHTML = '<div class="post"><div class="post-content">No posts found. Add text files named Data_0001.txt, Data_0002.txt, etc. to display content.</div></div>';
+                    container.innerHTML = '<div class="post"><div class="post-content">No posts found.</div></div>';
                 }
             } catch (error) {
                 container.innerHTML = '<div class="post"><div class="post-content">Error loading posts: ' + error.message + '</div></div>';
             }
         }
         
-        // Set up scroll observer
         function setupScrollObserver() {
             window.addEventListener('scroll', () => {
                 const posts = document.querySelectorAll('.post[data-youtube]');
@@ -596,7 +542,6 @@
                 posts.forEach(post => {
                     const rect = post.getBoundingClientRect();
                     
-                    // If the top of the post is near the middle of screen
                     if (rect.top < windowCenter && rect.bottom > windowCenter) {
                         const youtubeId = post.dataset.youtube;
                         if (youtubeId && youtubeId !== currentVideoId) {
@@ -608,7 +553,6 @@
             });
         }
         
-        // Load posts
         loadPosts();
     </script>
 </body>
